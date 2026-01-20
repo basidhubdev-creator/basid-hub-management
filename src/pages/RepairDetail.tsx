@@ -5,7 +5,6 @@ import {
   User,
   Phone,
   Mail,
-  Calendar,
   Clock,
   Wrench,
   Camera,
@@ -18,13 +17,10 @@ import {
   MessageSquare,
 } from "lucide-react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { Textarea } from "@/components/ui/textarea";
-import { Progress } from "@/components/ui/progress";
-import { cn } from "@/lib/utils";
+import { Button, Badge, Card, Divider, Input, Progress, Typography, Space, Row, Col } from "antd";
+
+const { TextArea } = Input;
+const { Title, Text } = Typography;
 
 const statusSteps = [
   { key: "new", label: "New", icon: AlertCircle },
@@ -78,7 +74,7 @@ const RepairDetail = () => {
   const [newNote, setNewNote] = useState("");
 
   const ticket = mockTicket;
-  const currentStepIndex = statusSteps.findIndex((s) => s.key === ticket.status);
+  const currentStepIndex = Math.max(0, statusSteps.findIndex((s) => s.key === ticket.status));
   const progress = ((currentStepIndex + 1) / statusSteps.length) * 100;
 
   const partsTotal = ticket.parts.reduce((sum, p) => sum + p.price * p.qty, 0);
@@ -92,314 +88,327 @@ const RepairDetail = () => {
       description="Repair ticket details and progress"
     >
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-4">
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
           <Link to="/repairs">
-            <Button variant="ghost" size="icon">
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
+            <Button type="text" icon={<ArrowLeft style={{ fontSize: 16 }} />} />
           </Link>
           <div>
-            <div className="flex items-center gap-3">
-              <h1 className="text-2xl font-bold">{ticket.id}</h1>
-              <Badge className="bg-accent/10 text-accent">In Progress</Badge>
-            </div>
-            <p className="text-sm text-muted-foreground mt-1">
+            <Space align="center" size="small">
+              <Title level={2} style={{ margin: 0 }}>{ticket.id}</Title>
+              <Badge status="processing" text="In Progress" />
+            </Space>
+            <Text type="secondary" style={{ display: "block", marginTop: 4 }}>
               Created {ticket.createdAt} · Due {ticket.dueDate}
-            </p>
+            </Text>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline">
-            <Printer className="mr-2 h-4 w-4" />
+        <Space>
+          <Button icon={<Printer style={{ fontSize: 16 }} />}>
             Print Ticket
           </Button>
-          <Button variant="outline">
-            <CreditCard className="mr-2 h-4 w-4" />
+          <Button icon={<CreditCard style={{ fontSize: 16 }} />}>
             Add Payment
           </Button>
-          <Button className="bg-primary hover:bg-primary/90">
-            <Edit2 className="mr-2 h-4 w-4" />
+          <Button type="primary" icon={<Edit2 style={{ fontSize: 16 }} />}>
             Update Status
           </Button>
-        </div>
+        </Space>
       </div>
 
       {/* Status Timeline */}
-      <Card className="mb-6 border-border/50">
-        <CardContent className="pt-6">
-          <div className="relative">
-            <Progress value={progress} className="h-2 mb-6" />
-            <div className="flex justify-between">
-              {statusSteps.map((step, index) => {
-                const StepIcon = step.icon;
-                const isActive = index <= currentStepIndex;
-                const isCurrent = index === currentStepIndex;
+      <Card style={{ marginBottom: 24 }}>
+        <div style={{ paddingTop: 24 }}>
+          <Progress percent={progress} style={{ marginBottom: 24 }} />
+          <Row justify="space-between">
+            {statusSteps.map((step, index) => {
+              const StepIcon = step.icon;
+              const isActive = index <= currentStepIndex;
+              const isCurrent = index === currentStepIndex;
 
-                return (
-                  <div
-                    key={step.key}
-                    className={cn(
-                      "flex flex-col items-center gap-2",
-                      isActive ? "text-foreground" : "text-muted-foreground"
-                    )}
-                  >
+              return (
+                <Col key={step.key} span={3}>
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
                     <div
-                      className={cn(
-                        "flex h-10 w-10 items-center justify-center rounded-full border-2 transition-all",
-                        isCurrent
-                          ? "border-accent bg-accent text-accent-foreground"
-                          : isActive
-                          ? "border-primary bg-primary/10"
-                          : "border-muted bg-muted"
-                      )}
+                      style={{
+                        width: 40,
+                        height: 40,
+                        borderRadius: "50%",
+                        border: `2px solid ${isCurrent ? "#1976d2" : isActive ? "#1976d2" : "#d9d9d9"}`,
+                        backgroundColor: isCurrent ? "#1976d2" : isActive ? "rgba(25, 118, 210, 0.1)" : "#f5f5f5",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        color: isCurrent ? "#fff" : isActive ? "#1976d2" : "#8c8c8c",
+                      }}
                     >
-                      <StepIcon className="h-5 w-5" />
+                      <StepIcon style={{ fontSize: 20 }} />
                     </div>
-                    <span className="text-xs font-medium">{step.label}</span>
+                    <Text type={isActive ? undefined : "secondary"} style={{ fontSize: 12, fontWeight: 500 }}>
+                      {step.label}
+                    </Text>
                   </div>
-                );
-              })}
-            </div>
-          </div>
-        </CardContent>
+                </Col>
+              );
+            })}
+          </Row>
+        </div>
       </Card>
 
-      <div className="grid gap-6 lg:grid-cols-3">
+      <Row gutter={24}>
         {/* Left Column */}
-        <div className="lg:col-span-2 space-y-6">
+        <Col xs={24} lg={16}>
+          <Space direction="vertical" size="large" style={{ width: "100%" }}>
           {/* Customer & Device */}
-          <div className="grid gap-6 md:grid-cols-2">
-            <Card className="border-border/50">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base flex items-center gap-2">
-                  <User className="h-4 w-4" />
-                  Customer
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div>
-                  <p className="font-medium">{ticket.customer.name}</p>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Phone className="h-4 w-4" />
-                  {ticket.customer.phone}
-                </div>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Mail className="h-4 w-4" />
-                  {ticket.customer.email}
-                </div>
-                <Button variant="link" className="p-0 h-auto text-accent">
-                  View customer history →
-                </Button>
-              </CardContent>
-            </Card>
+          <Row gutter={24}>
+            <Col xs={24} md={12}>
+              <Card 
+                title={
+                  <Space>
+                    <User style={{ fontSize: 16 }} />
+                    Customer
+                  </Space>
+                }
+                style={{ height: "100%" }}
+              >
+                <Space direction="vertical" size="small" style={{ width: "100%" }}>
+                  <Text strong>{ticket.customer.name}</Text>
+                  <Space>
+                    <Phone style={{ fontSize: 16 }} />
+                    <Text type="secondary">{ticket.customer.phone}</Text>
+                  </Space>
+                  <Space>
+                    <Mail style={{ fontSize: 16 }} />
+                    <Text type="secondary">{ticket.customer.email}</Text>
+                  </Space>
+                  <Button type="link" style={{ padding: 0 }}>
+                    View customer history →
+                  </Button>
+                </Space>
+              </Card>
+            </Col>
 
-            <Card className="border-border/50">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base flex items-center gap-2">
-                  <Phone className="h-4 w-4" />
-                  Device
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div>
-                  <p className="font-medium">
-                    {ticket.device.brand} {ticket.device.model}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    {ticket.device.color}
-                  </p>
-                </div>
-                <div className="text-sm">
-                  <span className="text-muted-foreground">IMEI: </span>
-                  <span className="font-mono">{ticket.device.imei}</span>
-                </div>
-                <div className="text-sm">
-                  <span className="text-muted-foreground">Condition: </span>
-                  {ticket.device.condition}
-                </div>
-                <Button variant="outline" size="sm" className="w-full">
-                  <Camera className="mr-2 h-4 w-4" />
-                  View/Add Photos
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
+            <Col xs={24} md={12}>
+              <Card 
+                title={
+                  <Space>
+                    <Phone style={{ fontSize: 16 }} />
+                    Device
+                  </Space>
+                }
+                style={{ height: "100%" }}
+              >
+                <Space direction="vertical" size="small" style={{ width: "100%" }}>
+                  <div>
+                    <Text strong>
+                      {ticket.device.brand} {ticket.device.model}
+                    </Text>
+                    <br />
+                    <Text type="secondary">{ticket.device.color}</Text>
+                  </div>
+                  <Text type="secondary">
+                    IMEI: <Text code>{ticket.device.imei}</Text>
+                  </Text>
+                  <Text type="secondary">
+                    Condition: {ticket.device.condition}
+                  </Text>
+                  <Button block icon={<Camera style={{ fontSize: 16 }} />}>
+                    View/Add Photos
+                  </Button>
+                </Space>
+              </Card>
+            </Col>
+          </Row>
 
           {/* Problem Description */}
-          <Card className="border-border/50">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base">Problem Description</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm leading-relaxed">{ticket.issue}</p>
-            </CardContent>
+          <Card title="Problem Description">
+            <Text>{ticket.issue}</Text>
           </Card>
 
           {/* Parts & Labor */}
-          <Card className="border-border/50">
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-base">Parts & Labor</CardTitle>
-                <Button variant="ghost" size="sm">
-                  <Plus className="mr-2 h-4 w-4" />
-                  Add Item
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {ticket.parts.map((part, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between p-3 rounded-lg bg-secondary/50"
-                  >
-                    <div>
-                      <p className="font-medium text-sm">{part.name}</p>
-                      <p className="text-xs text-muted-foreground">
-                        Qty: {part.qty} · Cost: ₦{part.cost.toLocaleString()}
-                      </p>
-                    </div>
-                    <span className="font-mono font-medium">
-                      ₦{part.price.toLocaleString()}
-                    </span>
-                  </div>
-                ))}
-                <div className="flex items-center justify-between p-3 rounded-lg bg-secondary/50">
+          <Card 
+            title="Parts & Labor"
+            extra={
+              <Button type="text" size="small" icon={<Plus style={{ fontSize: 16 }} />}>
+                Add Item
+              </Button>
+            }
+          >
+            <Space direction="vertical" size="middle" style={{ width: "100%" }}>
+              {ticket.parts.map((part, index) => (
+                <div
+                  key={index}
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    padding: 12,
+                    borderRadius: 8,
+                    backgroundColor: "#fafafa"
+                  }}
+                >
                   <div>
-                    <p className="font-medium text-sm">Labor</p>
-                    <p className="text-xs text-muted-foreground">Repair service</p>
+                    <Text strong style={{ fontSize: 14 }}>{part.name}</Text>
+                    <br />
+                    <Text type="secondary" style={{ fontSize: 12 }}>
+                      Qty: {part.qty} · Cost: ₦{part.cost.toLocaleString()}
+                    </Text>
                   </div>
-                  <span className="font-mono font-medium">
-                    ₦{ticket.labor.toLocaleString()}
-                  </span>
+                  <Text code strong>
+                    ₦{part.price.toLocaleString()}
+                  </Text>
                 </div>
-                <Separator />
-                <div className="flex items-center justify-between pt-2">
-                  <span className="font-semibold">Total</span>
-                  <span className="font-mono font-bold text-lg">
-                    ₦{grandTotal.toLocaleString()}
-                  </span>
+              ))}
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  padding: 12,
+                  borderRadius: 8,
+                  backgroundColor: "#fafafa"
+                }}
+              >
+                <div>
+                  <Text strong style={{ fontSize: 14 }}>Labor</Text>
+                  <br />
+                  <Text type="secondary" style={{ fontSize: 12 }}>Repair service</Text>
                 </div>
+                <Text code strong>
+                  ₦{ticket.labor.toLocaleString()}
+                </Text>
               </div>
-            </CardContent>
+              <Divider />
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <Text strong>Total</Text>
+                <Text code strong style={{ fontSize: 18 }}>
+                  ₦{grandTotal.toLocaleString()}
+                </Text>
+              </div>
+            </Space>
           </Card>
 
           {/* Notes */}
-          <Card className="border-border/50">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base flex items-center gap-2">
-                <MessageSquare className="h-4 w-4" />
+          <Card 
+            title={
+              <Space>
+                <MessageSquare style={{ fontSize: 16 }} />
                 Technician Notes
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4 mb-4">
-                {ticket.notes.map((note, index) => (
-                  <div key={index} className="flex gap-3">
-                    <div className="h-8 w-8 rounded-full bg-secondary flex items-center justify-center shrink-0">
-                      <User className="h-4 w-4 text-muted-foreground" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-sm font-medium">{note.author}</span>
-                        <span className="text-xs text-muted-foreground">
-                          {note.date}
-                        </span>
-                      </div>
-                      <p className="text-sm text-muted-foreground">{note.text}</p>
-                    </div>
+              </Space>
+            }
+          >
+            <Space direction="vertical" size="middle" style={{ width: "100%", marginBottom: 16 }}>
+              {ticket.notes.map((note, index) => (
+                <div key={index} style={{ display: "flex", gap: 12 }}>
+                  <div style={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: "50%",
+                    backgroundColor: "#f5f5f5",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexShrink: 0,
+                  }}>
+                    <User style={{ fontSize: 16, color: "#8c8c8c" }} />
                   </div>
-                ))}
-              </div>
-              <div className="space-y-2">
-                <Textarea
-                  placeholder="Add a note..."
-                  value={newNote}
-                  onChange={(e) => setNewNote(e.target.value)}
-                  className="min-h-[80px]"
-                />
-                <Button size="sm" disabled={!newNote.trim()}>
-                  Add Note
-                </Button>
-              </div>
-            </CardContent>
+                  <div style={{ flex: 1 }}>
+                    <Space size="small" style={{ marginBottom: 4 }}>
+                      <Text strong style={{ fontSize: 14 }}>{note.author}</Text>
+                      <Text type="secondary" style={{ fontSize: 12 }}>
+                        {note.date}
+                      </Text>
+                    </Space>
+                    <Text type="secondary" style={{ fontSize: 14 }}>{note.text}</Text>
+                  </div>
+                </div>
+              ))}
+            </Space>
+            <Space direction="vertical" size="small" style={{ width: "100%" }}>
+              <TextArea
+                placeholder="Add a note..."
+                value={newNote}
+                onChange={(e) => setNewNote(e.target.value)}
+                rows={3}
+              />
+              <Button size="small" disabled={!newNote.trim()}>
+                Add Note
+              </Button>
+            </Space>
           </Card>
-        </div>
+          </Space>
+        </Col>
 
         {/* Right Column - Payment Summary */}
-        <div className="space-y-6">
-          <Card className="border-border/50 sticky top-24">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base">Payment Summary</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Parts</span>
-                  <span className="font-mono">₦{partsTotal.toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Labor</span>
-                  <span className="font-mono">₦{ticket.labor.toLocaleString()}</span>
-                </div>
-                <Separator />
-                <div className="flex justify-between">
-                  <span className="font-medium">Total</span>
-                  <span className="font-mono font-semibold">
-                    ₦{grandTotal.toLocaleString()}
-                  </span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Paid</span>
-                  <span className="font-mono text-success">
-                    -₦{totalPaid.toLocaleString()}
-                  </span>
-                </div>
-                <Separator />
-                <div className="flex justify-between">
-                  <span className="font-semibold">Balance Due</span>
-                  <span
-                    className={cn(
-                      "font-mono font-bold text-lg",
-                      balance > 0 ? "text-destructive" : "text-success"
-                    )}
-                  >
-                    ₦{balance.toLocaleString()}
-                  </span>
-                </div>
+        <Col xs={24} lg={8}>
+        <Card 
+          title="Payment Summary"
+          style={{ position: "sticky", top: 96 }}
+        >
+          <Space direction="vertical" size="middle" style={{ width: "100%" }}>
+            <Space direction="vertical" size="small" style={{ width: "100%" }}>
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <Text type="secondary" style={{ fontSize: 14 }}>Parts</Text>
+                <Text code>₦{partsTotal.toLocaleString()}</Text>
               </div>
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <Text type="secondary" style={{ fontSize: 14 }}>Labor</Text>
+                <Text code>₦{ticket.labor.toLocaleString()}</Text>
+              </div>
+              <Divider style={{ margin: "8px 0" }} />
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <Text strong>Total</Text>
+                <Text code strong>₦{grandTotal.toLocaleString()}</Text>
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <Text type="secondary" style={{ fontSize: 14 }}>Paid</Text>
+                <Text code style={{ color: "#52c41a" }}>
+                  -₦{totalPaid.toLocaleString()}
+                </Text>
+              </div>
+              <Divider style={{ margin: "8px 0" }} />
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <Text strong>Balance Due</Text>
+                <Text code strong style={{ fontSize: 18, color: balance > 0 ? "#ff4d4f" : "#52c41a" }}>
+                  ₦{balance.toLocaleString()}
+                </Text>
+              </div>
+            </Space>
 
-              <Button className="w-full bg-primary hover:bg-primary/90">
-                <CreditCard className="mr-2 h-4 w-4" />
-                Record Payment
-              </Button>
+            <Button type="primary" block icon={<CreditCard style={{ fontSize: 16 }} />}>
+              Record Payment
+            </Button>
 
-              <div className="space-y-3">
-                <p className="text-sm font-medium">Payment History</p>
+            <div>
+              <Text strong style={{ fontSize: 14, display: "block", marginBottom: 12 }}>
+                Payment History
+              </Text>
+              <Space direction="vertical" size="small" style={{ width: "100%" }}>
                 {ticket.payments.map((payment, index) => (
                   <div
                     key={index}
-                    className="p-3 rounded-lg bg-secondary/50 space-y-1"
+                    style={{
+                      padding: 12,
+                      borderRadius: 8,
+                      backgroundColor: "#fafafa"
+                    }}
                   >
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium">{payment.method}</span>
-                      <span className="font-mono text-sm text-success">
+                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+                      <Text strong style={{ fontSize: 14 }}>{payment.method}</Text>
+                      <Text code style={{ fontSize: 14, color: "#52c41a" }}>
                         +₦{payment.amount.toLocaleString()}
-                      </span>
+                      </Text>
                     </div>
-                    <div className="flex items-center justify-between text-xs text-muted-foreground">
-                      <span>{payment.date}</span>
-                      <span className="font-mono">{payment.ref}</span>
+                    <div style={{ display: "flex", justifyContent: "space-between" }}>
+                      <Text type="secondary" style={{ fontSize: 12 }}>{payment.date}</Text>
+                      <Text code style={{ fontSize: 12 }}>{payment.ref}</Text>
                     </div>
                   </div>
                 ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+              </Space>
+            </div>
+          </Space>
+        </Card>
+        </Col>
+      </Row>
     </DashboardLayout>
   );
 };

@@ -1,4 +1,6 @@
-import { Link, useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import { Layout, Menu, Avatar, Button, Typography } from "antd";
+import type { MenuProps } from "antd";
 import {
   LayoutDashboard,
   ShoppingCart,
@@ -9,196 +11,195 @@ import {
   TrendingUp,
   FileText,
   Settings,
-  ChevronDown,
-  Smartphone,
-  ClipboardList,
   LogOut,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import { useState } from "react";
 
-interface NavItem {
-  title: string;
-  href?: string;
-  icon: React.ComponentType<{ className?: string }>;
-  children?: { title: string; href: string }[];
-}
+const { Sider } = Layout;
+const { Text, Title } = Typography;
 
-const navItems: NavItem[] = [
+type MenuItem = Required<MenuProps>["items"][number];
+
+const getMenuIcon = (Icon: React.ComponentType<{ style?: React.CSSProperties }>) => (
+  <Icon style={{ fontSize: 16 }} />
+);
+
+const navItems: MenuItem[] = [
   {
-    title: "Dashboard",
-    href: "/dashboard",
-    icon: LayoutDashboard,
+    key: "/dashboard",
+    icon: getMenuIcon(LayoutDashboard),
+    label: "Dashboard",
   },
   {
-    title: "Sales / POS",
-    href: "/pos/sales",
-    icon: ShoppingCart,
+    key: "/pos/sales",
+    icon: getMenuIcon(ShoppingCart),
+    label: "Sales / POS",
   },
   {
-    title: "Repairs",
-    href: "/repairs",
-    icon: Wrench,
+    key: "/repairs",
+    icon: getMenuIcon(Wrench),
+    label: "Repairs",
   },
   {
-    title: "Inventory",
-    icon: Package,
+    key: "inventory",
+    icon: getMenuIcon(Package),
+    label: "Inventory",
     children: [
-      { title: "Products & Stock", href: "/inventory" },
-      { title: "Purchase Orders", href: "/purchases" },
+      { key: "/inventory", label: "Products & Stock" },
+      { key: "/purchases", label: "Purchase Orders" },
     ],
   },
   {
-    title: "Customers",
-    href: "/customers",
-    icon: Users,
+    key: "/customers",
+    icon: getMenuIcon(Users),
+    label: "Customers",
   },
   {
-    title: "Wholesale",
-    icon: Building2,
+    key: "wholesale",
+    icon: getMenuIcon(Building2),
+    label: "Wholesale",
     children: [
-      { title: "Contracts", href: "/wholesale/contracts" },
-      { title: "Orders", href: "/wholesale/orders" },
+      { key: "/wholesale/contracts", label: "Contracts" },
+      { key: "/wholesale/orders", label: "Orders" },
     ],
   },
   {
-    title: "Investors",
-    href: "/investors",
-    icon: TrendingUp,
+    key: "/investors",
+    icon: getMenuIcon(TrendingUp),
+    label: "Investors",
   },
   {
-    title: "Reports",
-    href: "/reports",
-    icon: FileText,
+    key: "/reports",
+    icon: getMenuIcon(FileText),
+    label: "Reports",
   },
   {
-    title: "Settings",
-    href: "/settings",
-    icon: Settings,
+    key: "/settings",
+    icon: getMenuIcon(Settings),
+    label: "Settings",
   },
 ];
 
 export function Sidebar() {
+  const navigate = useNavigate();
   const location = useLocation();
-  const [openMenus, setOpenMenus] = useState<string[]>([]);
 
-  const toggleMenu = (title: string) => {
-    setOpenMenus((prev) =>
-      prev.includes(title)
-        ? prev.filter((t) => t !== title)
-        : [...prev, title]
-    );
+  const handleMenuClick: MenuProps["onClick"] = (e) => {
+    if (e.key && !e.keyPath.includes("inventory") && !e.keyPath.includes("wholesale")) {
+      navigate(e.key);
+    }
   };
 
-  const isActive = (href: string) => location.pathname === href;
-  const isChildActive = (children?: { href: string }[]) =>
-    children?.some((child) => location.pathname === child.href);
+  const selectedKeys = [location.pathname];
+  const openKeys = [];
+  if (location.pathname.startsWith("/inventory") || location.pathname === "/purchases") {
+    openKeys.push("inventory");
+  }
+  if (location.pathname.startsWith("/wholesale")) {
+    openKeys.push("wholesale");
+  }
 
   return (
-    <aside className="fixed left-0 top-0 z-40 h-screen w-64 bg-sidebar border-r border-sidebar-border">
-      <div className="flex h-full flex-col">
+    <Sider
+      width={256}
+      style={{
+        position: "fixed",
+        left: 0,
+        top: 0,
+        bottom: 0,
+        background: "#000000",
+        borderRight: "1px solid #e0e0e0",
+      }}
+    >
+      <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
         {/* Logo */}
-        <div className="flex h-16 items-center gap-3 border-b border-sidebar-border px-6">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-accent">
-            <Smartphone className="h-5 w-5 text-sidebar-primary-foreground" />
+       <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <div style={{
+              width: 48,
+              height: 48,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              borderRadius: 12,
+              background: "#ffffff",
+              border: "1px solid #e0e0e0",
+              boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
+            }}>
+              <img src="/logo.png" alt="logo" style={{ width: 24, height: 24, objectFit: "contain" }} />
+            </div>
+            <div>
+              <Title level={4} style={{ color: "#f1f5f9", margin: 0 }}>
+                Basid Hub
+              </Title>
+              <Text style={{ color: "rgba(241, 245, 249, 0.7)", fontSize: 14 }}>
+                Management Portal
+              </Text>
+            </div>
           </div>
-          <div className="flex flex-col">
-            <span className="text-base font-bold text-sidebar-foreground">
-              ShopFlow
-            </span>
-            <span className="text-xs text-sidebar-foreground/60">
-              Phone Shop Manager
-            </span>
-          </div>
-        </div>
+
 
         {/* Navigation */}
-        <nav className="flex-1 overflow-y-auto p-4">
-          <ul className="space-y-1">
-            {navItems.map((item) => (
-              <li key={item.title}>
-                {item.children ? (
-                  <Collapsible
-                    open={openMenus.includes(item.title) || isChildActive(item.children)}
-                    onOpenChange={() => toggleMenu(item.title)}
-                  >
-                    <CollapsibleTrigger className="flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-foreground/80 transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
-                      <span className="flex items-center gap-3">
-                        <item.icon className="h-4 w-4" />
-                        {item.title}
-                      </span>
-                      <ChevronDown
-                        className={cn(
-                          "h-4 w-4 transition-transform duration-200",
-                          (openMenus.includes(item.title) || isChildActive(item.children)) &&
-                            "rotate-180"
-                        )}
-                      />
-                    </CollapsibleTrigger>
-                    <CollapsibleContent className="animate-accordion-down">
-                      <ul className="mt-1 space-y-1 pl-7">
-                        {item.children.map((child) => (
-                          <li key={child.href}>
-                            <Link
-                              to={child.href}
-                              className={cn(
-                                "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
-                                isActive(child.href)
-                                  ? "bg-sidebar-accent text-sidebar-primary font-medium"
-                                  : "text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-                              )}
-                            >
-                              {child.title}
-                            </Link>
-                          </li>
-                        ))}
-                      </ul>
-                    </CollapsibleContent>
-                  </Collapsible>
-                ) : (
-                  <Link
-                    to={item.href!}
-                    className={cn(
-                      "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
-                      isActive(item.href!)
-                        ? "bg-sidebar-accent text-sidebar-primary"
-                        : "text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-                    )}
-                  >
-                    <item.icon className="h-4 w-4" />
-                    {item.title}
-                  </Link>
-                )}
-              </li>
-            ))}
-          </ul>
-        </nav>
+        <Menu
+          mode="inline"
+          selectedKeys={selectedKeys}
+          defaultOpenKeys={openKeys}
+          items={navItems}
+          onClick={handleMenuClick}
+          style={{
+            flex: 1,
+            background: "#000000",
+            color: "#ffffff",
+            borderRight: 0,
+            padding: "8px 0",
+          }}
+          theme="dark"
+        />
 
         {/* User section */}
-        <div className="border-t border-sidebar-border p-4">
-          <div className="flex items-center gap-3 rounded-lg px-3 py-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-sidebar-accent text-sm font-semibold text-sidebar-accent-foreground">
+        <div
+          style={{
+            borderTop: "1px solid #e0e0e0",
+            padding: "16px",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 12,
+              padding: "8px 12px",
+              borderRadius: 8,
+            }}
+          >
+            <Avatar
+              style={{
+                backgroundColor: "#1976d2",
+                color: "#ffffff",
+                fontWeight: 600,
+              }}
+            >
               AO
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-sidebar-foreground truncate">
-                Adebayo Okonkwo
-              </p>
-              <p className="text-xs text-sidebar-foreground/60 truncate">
+            </Avatar>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <Text
+                strong
+                style={{ color: "#ffffff", fontSize: 14, display: "block" }}
+                ellipsis
+              >
+                Taiwo Samson
+              </Text>
+              <Text style={{ color: "#94a3b8", fontSize: 12, display: "block" }} ellipsis>
                 Admin
-              </p>
+              </Text>
             </div>
-            <button className="rounded-md p-1.5 text-sidebar-foreground/60 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors">
-              <LogOut className="h-4 w-4" />
-            </button>
+            <Button
+              type="text"
+              icon={<LogOut style={{ fontSize: 16 }} />}
+              style={{ color: "#b0b0b0" }}
+              onClick={() => navigate("/login")}
+            />
           </div>
         </div>
       </div>
-    </aside>
+    </Sider>
   );
 }

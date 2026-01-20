@@ -1,6 +1,9 @@
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
+import { Layout } from "antd";
 import { Sidebar } from "./Sidebar";
 import { TopBar } from "./TopBar";
+
+const { Content } = Layout;
 
 interface DashboardLayoutProps {
   children: ReactNode;
@@ -10,12 +13,12 @@ interface DashboardLayoutProps {
 
 export function DashboardLayout({ children, title, description }: DashboardLayoutProps) {
   return (
-    <div className="min-h-screen bg-background">
+    <Layout style={{ minHeight: "100vh", background: "#ffffff" }}>
       <Sidebar />
-      <div className="pl-64">
+      <Layout style={{ marginLeft: 256 }}>
         <TopBar title={title} description={description} />
-        <main className="p-6">{children}</main>
-      </div>
-    </div>
+        <Content style={{ padding: 24 }}>{children}</Content>
+      </Layout>
+    </Layout>
   );
 }

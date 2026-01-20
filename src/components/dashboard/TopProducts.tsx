@@ -1,5 +1,6 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
+import { Card, Progress, Typography, Badge } from "antd";
+
+const { Title, Text } = Typography;
 
 const topProducts = [
   { name: "iPhone 15 Pro Max", sales: 45, revenue: 2700000, progress: 100 },
@@ -11,33 +12,59 @@ const topProducts = [
 
 export function TopProducts() {
   return (
-    <Card className="border-border/50">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-base font-semibold">Top Selling Models</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          {topProducts.map((product, index) => (
-            <div key={product.name} className="space-y-2">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-secondary text-xs font-semibold text-muted-foreground">
-                    {index + 1}
-                  </span>
-                  <span className="text-sm font-medium">{product.name}</span>
-                </div>
-                <div className="text-right">
-                  <p className="text-sm font-mono font-semibold">
-                    ₦{(product.revenue / 1000).toFixed(0)}k
-                  </p>
-                  <p className="text-xs text-muted-foreground">{product.sales} units</p>
-                </div>
+    <Card
+      style={{ borderRadius: 12, border: "1px solid #e5e7eb" }}
+      styles={{
+        header: { borderBottom: "1px solid #e5e7eb", padding: "16px 24px" },
+        body: { padding: 24 },
+      }}
+      title={<Title level={5} style={{ margin: 0 }}>Top Selling Models</Title>}
+    >
+      <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+        {topProducts.map((product, index) => (
+          <div key={product.name}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <Badge
+                  count={index + 1}
+                  style={{
+                    backgroundColor: "#f5f5f5",
+                    color: "#8c8c8c",
+                    minWidth: 24,
+                    height: 24,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    borderRadius: "50%",
+                    fontSize: 12,
+                    fontWeight: 600,
+                  }}
+                />
+                <Text strong style={{ fontSize: 14 }}>{product.name}</Text>
               </div>
-              <Progress value={product.progress} className="h-1.5" />
+              <div style={{ textAlign: "right" }}>
+                <Text
+                  strong
+                  style={{
+                    fontSize: 14,
+                    fontFamily: "'JetBrains Mono', ui-monospace, monospace",
+                    display: "block",
+                  }}
+                >
+                  ₦{(product.revenue / 1000).toFixed(0)}k
+                </Text>
+                <Text type="secondary" style={{ fontSize: 12 }}>{product.sales} units</Text>
+              </div>
             </div>
-          ))}
-        </div>
-      </CardContent>
+            <Progress
+              percent={product.progress}
+              showInfo={false}
+              strokeColor="#1976d2"
+              size="small"
+            />
+          </div>
+        ))}
+      </div>
     </Card>
   );
 }

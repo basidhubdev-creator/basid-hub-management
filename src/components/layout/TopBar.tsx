@@ -1,13 +1,9 @@
 import { Bell, Search, Calendar } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Layout, Input, Select, Button, Badge, Typography } from "antd";
+
+const { Header } = Layout;
+const { Title, Text } = Typography;
+const { Option } = Select;
 
 interface TopBarProps {
   title: string;
@@ -16,45 +12,63 @@ interface TopBarProps {
 
 export function TopBar({ title, description }: TopBarProps) {
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-6">
-      <div className="flex flex-col">
-        <h1 className="text-lg font-semibold text-foreground">{title}</h1>
+    <Header
+      style={{
+        position: "sticky",
+        top: 0,
+        zIndex: 30,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        borderBottom: "1px solid #e5e7eb",
+        background: "rgba(255, 255, 255, 0.95)",
+        backdropFilter: "blur(8px)",
+        padding: "0 24px",
+        height: 64,
+      }}
+    >
+      <div style={{ display: "flex", flexDirection: "column" }}>
+        <Title level={5} style={{ margin: 0, fontSize: 18 }}>
+          {title}
+        </Title>
         {description && (
-          <p className="text-xs text-muted-foreground">{description}</p>
+          <Text type="secondary" style={{ fontSize: 12 }}>
+            {description}
+          </Text>
         )}
       </div>
 
-      <div className="flex items-center gap-3">
+      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
         {/* Date Range Selector */}
-        <Select defaultValue="today">
-          <SelectTrigger className="w-[140px] h-9 text-sm bg-secondary border-0">
-            <Calendar className="mr-2 h-3.5 w-3.5 text-muted-foreground" />
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="today">Today</SelectItem>
-            <SelectItem value="week">This Week</SelectItem>
-            <SelectItem value="month">This Month</SelectItem>
-            <SelectItem value="quarter">This Quarter</SelectItem>
-            <SelectItem value="year">This Year</SelectItem>
-          </SelectContent>
+        <Select
+          defaultValue="today"
+          style={{ width: 140 }}
+          suffixIcon={<Calendar style={{ fontSize: 14 }} />}
+        >
+          <Option value="today">Today</Option>
+          <Option value="week">This Week</Option>
+          <Option value="month">This Month</Option>
+          <Option value="quarter">This Quarter</Option>
+          <Option value="year">This Year</Option>
         </Select>
 
         {/* Search */}
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search..."
-            className="w-64 pl-9 h-9 bg-secondary border-0 placeholder:text-muted-foreground/60"
-          />
-        </div>
+        <Input
+          placeholder="Search..."
+          prefix={<Search className="h-4 w-4" />}
+          style={{ width: 256 }}
+          allowClear
+        />
 
         {/* Notifications */}
-        <Button variant="ghost" size="icon" className="relative h-9 w-9">
-          <Bell className="h-4 w-4 text-muted-foreground" />
-          <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-accent animate-pulse-subtle" />
-        </Button>
+        <Badge dot color="#1976d2">
+          <Button
+            type="text"
+            icon={<Bell style={{ fontSize: 16 }} />}
+            style={{ display: "flex", alignItems: "center", justifyContent: "center" }}
+          />
+        </Badge>
       </div>
-    </header>
+    </Header>
   );
 }

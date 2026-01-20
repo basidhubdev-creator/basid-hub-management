@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import {
   Search,
   Plus,
@@ -14,33 +13,13 @@ import {
   Download,
   Upload,
 } from "lucide-react";
+import { Card, Input, Button, Badge, Select, Table, Dropdown, Space, Typography } from "antd";
+import type { ColumnsType } from "antd/es/table";
+import type { MenuProps } from "antd";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { cn } from "@/lib/utils";
+
+const { Title, Text } = Typography;
+const { Option } = Select;
 
 interface Product {
   id: string;
@@ -70,10 +49,10 @@ const products: Product[] = [
 ];
 
 const categoryConfig = {
-  phone: { label: "Phones", icon: Smartphone, color: "bg-primary/10 text-primary" },
-  accessory: { label: "Accessories", icon: Headphones, color: "bg-info/10 text-info" },
-  part: { label: "Parts", icon: Wrench, color: "bg-warning/10 text-warning" },
-  service: { label: "Services", icon: Package, color: "bg-success/10 text-success" },
+  phone: { label: "Phones", icon: Smartphone, color: "blue" },
+  accessory: { label: "Accessories", icon: Headphones, color: "cyan" },
+  part: { label: "Parts", icon: Wrench, color: "orange" },
+  service: { label: "Services", icon: Package, color: "green" },
 };
 
 const Inventory = () => {
@@ -101,216 +80,216 @@ const Inventory = () => {
   );
   const lowStockCount = products.filter((p) => p.stock <= p.minStock).length;
 
+  const getDropdownMenu = (): MenuProps => ({
+    items: [
+      { key: "view", label: "View Details" },
+      { key: "edit", label: "Edit Product" },
+      { key: "adjust", label: "Adjust Stock" },
+      { type: "divider" },
+      { key: "history", label: "View History" },
+      { key: "delete", label: "Delete", danger: true },
+    ],
+  });
+
+  const columns: ColumnsType<Product> = [
+    {
+      title: "SKU",
+      dataIndex: "sku",
+      key: "sku",
+      width: 100,
+      render: (sku: string) => <Text code>{sku}</Text>,
+    },
+    {
+      title: "Product",
+      key: "product",
+      render: (_, record) => (
+        <div>
+          <Text strong>{record.name}</Text>
+          <br />
+          <Text type="secondary" style={{ fontSize: 12 }}>
+            {record.brand}
+            {record.imei && (
+              <span style={{ marginLeft: 8, fontFamily: "monospace" }}>
+                IMEI: {record.imei}
+              </span>
+            )}
+          </Text>
+        </div>
+      ),
+    },
+    {
+      title: "Category",
+      dataIndex: "category",
+      key: "category",
+      render: (category: string) => {
+        const config = categoryConfig[category as keyof typeof categoryConfig];
+        const Icon = config.icon;
+        return (
+          <Badge color={config.color} text={config.label}>
+            <Icon style={{ fontSize: 12, marginRight: 4 }} />
+          </Badge>
+        );
+      },
+    },
+    {
+      title: "Condition",
+      dataIndex: "condition",
+      key: "condition",
+      render: (condition: string) => (
+        <Badge
+          status={condition === "used" ? "warning" : "default"}
+          text={condition}
+        />
+      ),
+    },
+    {
+      title: (
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 4 }}>
+          Stock
+          <ArrowUpDown style={{ fontSize: 14 }} />
+        </div>
+      ),
+      dataIndex: "stock",
+      key: "stock",
+      align: "center",
+      render: (stock: number, record) => {
+        const isLowStock = stock <= record.minStock;
+        return (
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+            {isLowStock && <AlertTriangle style={{ fontSize: 16, color: "#faad14" }} />}
+            <Text strong={isLowStock} style={{ fontFamily: "monospace", color: isLowStock ? "#faad14" : undefined }}>
+              {stock}
+            </Text>
+            <Text type="secondary" style={{ fontSize: 12 }}>
+              / {record.minStock} min
+            </Text>
+          </div>
+        );
+      },
+    },
+    {
+      title: "Cost Price",
+      dataIndex: "costPrice",
+      key: "costPrice",
+      align: "right",
+      render: (price: number) => (
+        <Text style={{ fontFamily: "monospace" }}>₦{price.toLocaleString()}</Text>
+      ),
+    },
+    {
+      title: "Selling Price",
+      dataIndex: "sellingPrice",
+      key: "sellingPrice",
+      align: "right",
+      render: (price: number) => (
+        <Text strong style={{ fontFamily: "monospace" }}>₦{price.toLocaleString()}</Text>
+      ),
+    },
+    {
+      title: "Margin",
+      key: "margin",
+      align: "right",
+      render: (_, record) => {
+        const margin = (((record.sellingPrice - record.costPrice) / record.costPrice) * 100).toFixed(0);
+        return <Text style={{ fontFamily: "monospace", color: "#52c41a" }}>{margin}%</Text>;
+      },
+    },
+    {
+      title: "",
+      key: "actions",
+      width: 50,
+      render: () => (
+        <Dropdown menu={getDropdownMenu()} trigger={["click"]}>
+          <Button
+            type="text"
+            icon={<MoreHorizontal />}
+            style={{ opacity: 0 }}
+            className="group-hover:opacity-100"
+          />
+        </Dropdown>
+      ),
+    },
+  ];
+
   return (
     <DashboardLayout
       title="Inventory"
       description="Manage your products, parts, and stock levels"
     >
       {/* Summary Cards */}
-      <div className="grid grid-cols-4 gap-4 mb-6">
-        <div className="p-4 rounded-xl bg-card border border-border/50">
-          <p className="text-sm text-muted-foreground mb-1">Total Products</p>
-          <p className="text-2xl font-bold font-mono">{products.length}</p>
-        </div>
-        <div className="p-4 rounded-xl bg-card border border-border/50">
-          <p className="text-sm text-muted-foreground mb-1">Stock Value</p>
-          <p className="text-2xl font-bold font-mono">
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, marginBottom: 24 }}>
+        <Card>
+          <Text type="secondary" style={{ fontSize: 14, display: "block", marginBottom: 8 }}>Total Products</Text>
+          <Title level={2} style={{ margin: 0, fontFamily: "monospace" }}>{products.length}</Title>
+        </Card>
+        <Card>
+          <Text type="secondary" style={{ fontSize: 14, display: "block", marginBottom: 8 }}>Stock Value</Text>
+          <Title level={2} style={{ margin: 0, fontFamily: "monospace" }}>
             ₦{(totalValue / 1000000).toFixed(1)}M
-          </p>
-        </div>
-        <div className="p-4 rounded-xl bg-card border border-border/50">
-          <p className="text-sm text-muted-foreground mb-1">Low Stock Items</p>
-          <p className="text-2xl font-bold font-mono text-warning">
+          </Title>
+        </Card>
+        <Card>
+          <Text type="secondary" style={{ fontSize: 14, display: "block", marginBottom: 8 }}>Low Stock Items</Text>
+          <Title level={2} style={{ margin: 0, fontFamily: "monospace", color: "#faad14" }}>
             {lowStockCount}
-          </p>
-        </div>
-        <div className="p-4 rounded-xl bg-card border border-border/50">
-          <p className="text-sm text-muted-foreground mb-1">Categories</p>
-          <p className="text-2xl font-bold font-mono">4</p>
-        </div>
+          </Title>
+        </Card>
+        <Card>
+          <Text type="secondary" style={{ fontSize: 14, display: "block", marginBottom: 8 }}>Categories</Text>
+          <Title level={2} style={{ margin: 0, fontFamily: "monospace" }}>4</Title>
+        </Card>
       </div>
 
       {/* Actions Bar */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-3">
-          <div className="relative w-80">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search products, SKU, IMEI..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 h-10 bg-card border-border/50"
-            />
-          </div>
-          <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-            <SelectTrigger className="w-[140px] h-10 bg-card border-border/50">
-              <Filter className="mr-2 h-4 w-4" />
-              <SelectValue placeholder="Category" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Categories</SelectItem>
-              <SelectItem value="phone">Phones</SelectItem>
-              <SelectItem value="accessory">Accessories</SelectItem>
-              <SelectItem value="part">Parts</SelectItem>
-              <SelectItem value="service">Services</SelectItem>
-            </SelectContent>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+        <Space>
+          <Input
+            placeholder="Search products, SKU, IMEI..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            prefix={<Search />}
+            style={{ width: 320, height: 40 }}
+          />
+          <Select
+            value={categoryFilter}
+            onChange={setCategoryFilter}
+            style={{ width: 140, height: 40 }}
+            suffixIcon={<Filter />}
+          >
+            <Option value="all">All Categories</Option>
+            <Option value="phone">Phones</Option>
+            <Option value="accessory">Accessories</Option>
+            <Option value="part">Parts</Option>
+            <Option value="service">Services</Option>
           </Select>
-          <Select value={stockFilter} onValueChange={setStockFilter}>
-            <SelectTrigger className="w-[140px] h-10 bg-card border-border/50">
-              <SelectValue placeholder="Stock" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Stock</SelectItem>
-              <SelectItem value="low">Low Stock</SelectItem>
-              <SelectItem value="out">Out of Stock</SelectItem>
-            </SelectContent>
+          <Select
+            value={stockFilter}
+            onChange={setStockFilter}
+            style={{ width: 140, height: 40 }}
+          >
+            <Option value="all">All Stock</Option>
+            <Option value="low">Low Stock</Option>
+            <Option value="out">Out of Stock</Option>
           </Select>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline">
-            <Download className="mr-2 h-4 w-4" />
-            Export
-          </Button>
-          <Button variant="outline">
-            <Upload className="mr-2 h-4 w-4" />
-            Import
-          </Button>
-          <Button className="bg-primary hover:bg-primary/90">
-            <Plus className="mr-2 h-4 w-4" />
+        </Space>
+        <Space>
+          <Button icon={<Download />}>Export</Button>
+          <Button icon={<Upload />}>Import</Button>
+          <Button type="primary" icon={<Plus />}>
             Add Product
           </Button>
-        </div>
+        </Space>
       </div>
 
       {/* Products Table */}
-      <div className="rounded-xl border border-border/50 bg-card overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow className="hover:bg-transparent">
-              <TableHead className="w-[100px]">SKU</TableHead>
-              <TableHead>Product</TableHead>
-              <TableHead>Category</TableHead>
-              <TableHead>Condition</TableHead>
-              <TableHead className="text-center">
-                <div className="flex items-center justify-center gap-1">
-                  Stock
-                  <ArrowUpDown className="h-3.5 w-3.5" />
-                </div>
-              </TableHead>
-              <TableHead className="text-right">Cost Price</TableHead>
-              <TableHead className="text-right">Selling Price</TableHead>
-              <TableHead className="text-right">Margin</TableHead>
-              <TableHead className="w-[50px]"></TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredProducts.map((product) => {
-              const category = categoryConfig[product.category];
-              const CategoryIcon = category.icon;
-              const isLowStock = product.stock <= product.minStock;
-              const margin = (
-                ((product.sellingPrice - product.costPrice) /
-                  product.costPrice) *
-                100
-              ).toFixed(0);
-
-              return (
-                <TableRow key={product.id} className="group">
-                  <TableCell>
-                    <span className="font-mono text-sm">{product.sku}</span>
-                  </TableCell>
-                  <TableCell>
-                    <div>
-                      <p className="font-medium text-sm">{product.name}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {product.brand}
-                        {product.imei && (
-                          <span className="ml-2 font-mono">
-                            IMEI: {product.imei}
-                          </span>
-                        )}
-                      </p>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <Badge className={cn("gap-1", category.color)}>
-                      <CategoryIcon className="h-3 w-3" />
-                      {category.label}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Badge
-                      variant="outline"
-                      className={cn(
-                        product.condition === "used" &&
-                          "border-warning text-warning"
-                      )}
-                    >
-                      {product.condition}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-center">
-                    <div className="flex items-center justify-center gap-2">
-                      {isLowStock && (
-                        <AlertTriangle className="h-4 w-4 text-warning" />
-                      )}
-                      <span
-                        className={cn(
-                          "font-mono font-medium",
-                          isLowStock && "text-warning"
-                        )}
-                      >
-                        {product.stock}
-                      </span>
-                      <span className="text-xs text-muted-foreground">
-                        / {product.minStock} min
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <span className="font-mono text-sm">
-                      ₦{product.costPrice.toLocaleString()}
-                    </span>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <span className="font-mono text-sm font-medium">
-                      ₦{product.sellingPrice.toLocaleString()}
-                    </span>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <span className="font-mono text-sm text-success">
-                      {margin}%
-                    </span>
-                  </TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 opacity-0 group-hover:opacity-100"
-                        >
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem>View Details</DropdownMenuItem>
-                        <DropdownMenuItem>Edit Product</DropdownMenuItem>
-                        <DropdownMenuItem>Adjust Stock</DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem>View History</DropdownMenuItem>
-                        <DropdownMenuItem className="text-destructive">
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      </div>
+      <Card>
+        <Table
+          columns={columns}
+          dataSource={filteredProducts}
+          rowKey="id"
+          pagination={{ pageSize: 10 }}
+        />
+      </Card>
     </DashboardLayout>
   );
 };

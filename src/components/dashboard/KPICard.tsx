@@ -1,6 +1,8 @@
-import { ReactNode } from "react";
-import { cn } from "@/lib/utils";
+import type { ReactNode } from "react";
+import { Card, Statistic, Typography } from "antd";
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
+
+const { Text } = Typography;
 
 interface KPICardProps {
   title: string;
@@ -29,38 +31,67 @@ export function KPICard({
   
   const trendColor =
     trend === "up"
-      ? "text-success"
+      ? "#52c41a"
       : trend === "down"
-      ? "text-destructive"
-      : "text-muted-foreground";
+      ? "#ff4d4f"
+      : "#8c8c8c";
+
+  const displayValue = prefix ? `${prefix}${value}` : suffix ? `${value} ${suffix}` : value;
 
   return (
-    <div className={cn("kpi-card group", className)}>
-      <div className="flex items-start justify-between">
-        <div className="space-y-3">
-          <p className="text-sm font-medium text-muted-foreground">{title}</p>
-          <div className="flex items-baseline gap-1">
-            {prefix && <span className="currency-prefix">{prefix}</span>}
-            <span className="stat-value text-foreground">{value}</span>
-            {suffix && <span className="text-sm text-muted-foreground ml-1">{suffix}</span>}
-          </div>
+    <Card
+      className={className}
+      style={{
+        borderRadius: 12,
+        border: "1px solid #e5e7eb",
+        transition: "all 0.2s",
+      }}
+      bodyStyle={{ padding: 20 }}
+      hoverable
+    >
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+        <div style={{ flex: 1 }}>
+          <Text type="secondary" style={{ fontSize: 14, display: "block", marginBottom: 12 }}>
+            {title}
+          </Text>
+          <Statistic
+            value={displayValue}
+            valueStyle={{
+              fontSize: 24,
+              fontWeight: 700,
+              fontFamily: "'JetBrains Mono', ui-monospace, monospace",
+              color: "#000000",
+            }}
+          />
         </div>
         {icon && (
-          <div className="rounded-lg bg-secondary p-2.5 text-muted-foreground group-hover:bg-accent/10 group-hover:text-accent transition-colors">
+          <div
+            style={{
+              borderRadius: 8,
+              background: "#f5f5f5",
+              padding: 10,
+              color: "#000000",
+              transition: "all 0.2s",
+            }}
+          >
             {icon}
           </div>
         )}
       </div>
       
       {change !== undefined && (
-        <div className="mt-4 flex items-center gap-2">
-          <div className={cn("flex items-center gap-1 text-sm font-medium", trendColor)}>
-            <TrendIcon className="h-3.5 w-3.5" />
-            <span>{Math.abs(change)}%</span>
+        <div style={{ marginTop: 16, display: "flex", alignItems: "center", gap: 8 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 4, color: trendColor }}>
+            <TrendIcon style={{ width: 14, height: 14 }} />
+            <Text strong style={{ fontSize: 14, color: trendColor }}>
+              {Math.abs(change)}%
+            </Text>
           </div>
-          <span className="text-xs text-muted-foreground">{changeLabel}</span>
+          <Text type="secondary" style={{ fontSize: 12 }}>
+            {changeLabel}
+          </Text>
         </div>
       )}
-    </div>
+    </Card>
   );
 }

@@ -3,34 +3,32 @@ import {
   Search,
   Plus,
   Filter,
-  User,
   Phone,
   Mail,
-  MapPin,
   ShoppingBag,
   Wrench,
   MoreHorizontal,
   Star,
 } from "lucide-react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
 import {
+  Button,
+  Input,
+  Badge,
   Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { cn } from "@/lib/utils";
+  Card,
+  Typography,
+  Space,
+  Row,
+  Col,
+  Avatar,
+  Dropdown,
+  Tag,
+} from "antd";
+import type { MenuProps } from "antd";
+
+const { Option } = Select;
+const { Title, Text } = Typography;
 
 interface Customer {
   id: string;
@@ -145,182 +143,214 @@ const Customers = () => {
   const wholesaleCount = customers.filter((c) => c.type === "wholesale").length;
   const vipCount = customers.filter((c) => c.isVIP).length;
 
+  const menuItems: MenuProps["items"] = [
+    { key: "view", label: "View Profile" },
+    { key: "sale", label: "Create Sale" },
+    { key: "repair", label: "Create Repair" },
+    { key: "edit", label: "Edit Customer" },
+  ];
+
   return (
     <DashboardLayout
       title="Customers"
       description="Manage customer profiles and track purchase history"
     >
       {/* Summary Cards */}
-      <div className="grid grid-cols-4 gap-4 mb-6">
-        <div className="p-4 rounded-xl bg-card border border-border/50">
-          <p className="text-sm text-muted-foreground mb-1">Total Customers</p>
-          <p className="text-2xl font-bold font-mono">{totalCustomers}</p>
-        </div>
-        <div className="p-4 rounded-xl bg-card border border-border/50">
-          <p className="text-sm text-muted-foreground mb-1">Retail</p>
-          <p className="text-2xl font-bold font-mono">
-            {totalCustomers - wholesaleCount}
-          </p>
-        </div>
-        <div className="p-4 rounded-xl bg-card border border-border/50">
-          <p className="text-sm text-muted-foreground mb-1">Wholesale</p>
-          <p className="text-2xl font-bold font-mono">{wholesaleCount}</p>
-        </div>
-        <div className="p-4 rounded-xl bg-card border border-border/50">
-          <p className="text-sm text-muted-foreground mb-1">VIP Customers</p>
-          <p className="text-2xl font-bold font-mono text-accent">{vipCount}</p>
-        </div>
-      </div>
+      <Row gutter={16} style={{ marginBottom: 24 }}>
+        <Col span={6}>
+          <Card style={{ borderRadius: 12, border: "1px solid #e5e7eb" }} bodyStyle={{ padding: 16 }}>
+            <Text type="secondary" style={{ fontSize: 14, display: "block", marginBottom: 4 }}>
+              Total Customers
+            </Text>
+            <Title level={3} style={{ margin: 0, fontFamily: "'JetBrains Mono', ui-monospace, monospace" }}>
+              {totalCustomers}
+            </Title>
+          </Card>
+        </Col>
+        <Col span={6}>
+          <Card style={{ borderRadius: 12, border: "1px solid #e5e7eb" }} bodyStyle={{ padding: 16 }}>
+            <Text type="secondary" style={{ fontSize: 14, display: "block", marginBottom: 4 }}>
+              Retail
+            </Text>
+            <Title level={3} style={{ margin: 0, fontFamily: "'JetBrains Mono', ui-monospace, monospace" }}>
+              {totalCustomers - wholesaleCount}
+            </Title>
+          </Card>
+        </Col>
+        <Col span={6}>
+          <Card style={{ borderRadius: 12, border: "1px solid #e5e7eb" }} bodyStyle={{ padding: 16 }}>
+            <Text type="secondary" style={{ fontSize: 14, display: "block", marginBottom: 4 }}>
+              Wholesale
+            </Text>
+            <Title level={3} style={{ margin: 0, fontFamily: "'JetBrains Mono', ui-monospace, monospace" }}>
+              {wholesaleCount}
+            </Title>
+          </Card>
+        </Col>
+        <Col span={6}>
+          <Card style={{ borderRadius: 12, border: "1px solid #e5e7eb" }} bodyStyle={{ padding: 16 }}>
+            <Text type="secondary" style={{ fontSize: 14, display: "block", marginBottom: 4 }}>
+              VIP Customers
+            </Text>
+            <Title level={3} style={{ margin: 0, fontFamily: "'JetBrains Mono', ui-monospace, monospace", color: "#1976d2" }}>
+              {vipCount}
+            </Title>
+          </Card>
+        </Col>
+      </Row>
 
       {/* Actions Bar */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-3">
-          <div className="relative w-80">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search by name, phone, or email..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 h-10 bg-card border-border/50"
-            />
-          </div>
-          <Select value={typeFilter} onValueChange={setTypeFilter}>
-            <SelectTrigger className="w-[140px] h-10 bg-card border-border/50">
-              <Filter className="mr-2 h-4 w-4" />
-              <SelectValue placeholder="Type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Types</SelectItem>
-              <SelectItem value="retail">Retail</SelectItem>
-              <SelectItem value="wholesale">Wholesale</SelectItem>
-            </SelectContent>
+      <Space style={{ marginBottom: 16, width: "100%", justifyContent: "space-between" }}>
+        <Space>
+          <Input
+            placeholder="Search by name, phone, or email..."
+            prefix={<Search style={{ color: "#8c8c8c" }} />}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={{ width: 320 }}
+          />
+          <Select
+            value={typeFilter}
+            onChange={setTypeFilter}
+            style={{ width: 140 }}
+            suffixIcon={<Filter style={{ color: "#8c8c8c" }} />}
+          >
+            <Option value="all">All Types</Option>
+            <Option value="retail">Retail</Option>
+            <Option value="wholesale">Wholesale</Option>
           </Select>
-        </div>
-        <Button className="bg-primary hover:bg-primary/90">
-          <Plus className="mr-2 h-4 w-4" />
+        </Space>
+        <Button type="primary" icon={<Plus />}>
           Add Customer
         </Button>
-      </div>
+      </Space>
 
       {/* Customers Grid */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <Row gutter={[16, 16]}>
         {filteredCustomers.map((customer) => (
-          <Card
-            key={customer.id}
-            className="border-border/50 hover:shadow-md transition-shadow group cursor-pointer"
-          >
-            <CardContent className="p-5">
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <div
-                    className={cn(
-                      "h-12 w-12 rounded-full flex items-center justify-center text-lg font-semibold",
-                      customer.isVIP
-                        ? "bg-gradient-accent text-primary"
-                        : "bg-secondary text-secondary-foreground"
-                    )}
+          <Col xs={24} sm={12} lg={8} key={customer.id}>
+            <Card
+              hoverable
+              style={{
+                borderRadius: 12,
+                border: "1px solid #e5e7eb",
+                cursor: "pointer",
+              }}
+              bodyStyle={{ padding: 20 }}
+              actions={[
+                <Dropdown
+                  key="menu"
+                  menu={{ items: menuItems }}
+                  trigger={["click"]}
+                  placement="bottomRight"
+                >
+                  <Button type="text" icon={<MoreHorizontal />} />
+                </Dropdown>,
+              ]}
+            >
+              <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 16 }}>
+                <Space>
+                  <Avatar
+                    size={48}
+                    style={{
+                      background: customer.isVIP
+                        ? "#1976d2"
+                        : "#f5f5f5",
+                      color: customer.isVIP ? "#ffffff" : "#8c8c8c",
+                      fontSize: 18,
+                      fontWeight: 600,
+                    }}
                   >
                     {customer.name
                       .split(" ")
                       .map((n) => n[0])
                       .join("")
                       .slice(0, 2)}
-                  </div>
+                  </Avatar>
                   <div>
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-semibold">{customer.name}</h3>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <Text strong style={{ fontSize: 16 }}>
+                        {customer.name}
+                      </Text>
                       {customer.isVIP && (
-                        <Star className="h-4 w-4 fill-accent text-accent" />
+                        <Star style={{ color: "#1976d2", fill: "#1976d2", fontSize: 16 }} />
                       )}
                     </div>
                     <Badge
-                      variant="secondary"
-                      className={cn(
-                        "text-xs mt-1",
-                        customer.type === "wholesale" &&
-                          "bg-info/10 text-info"
-                      )}
-                    >
-                      {customer.type}
-                    </Badge>
+                      count={customer.type}
+                      style={{
+                        backgroundColor: customer.type === "wholesale" ? "#1890ff15" : undefined,
+                        color: customer.type === "wholesale" ? "#1890ff" : undefined,
+                        marginTop: 4,
+                      }}
+                    />
                   </div>
-                </div>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 opacity-0 group-hover:opacity-100"
-                    >
-                      <MoreHorizontal className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem>View Profile</DropdownMenuItem>
-                    <DropdownMenuItem>Create Sale</DropdownMenuItem>
-                    <DropdownMenuItem>Create Repair</DropdownMenuItem>
-                    <DropdownMenuItem>Edit Customer</DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                </Space>
               </div>
 
-              <div className="space-y-2 mb-4">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Phone className="h-4 w-4" />
-                  {customer.phone}
-                </div>
+              <Space direction="vertical" size="small" style={{ width: "100%", marginBottom: 16 }}>
+                <Space size="small">
+                  <Phone style={{ color: "#8c8c8c", fontSize: 14 }} />
+                  <Text type="secondary" style={{ fontSize: 14 }}>
+                    {customer.phone}
+                  </Text>
+                </Space>
                 {customer.email && (
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <Mail className="h-4 w-4" />
-                    <span className="truncate">{customer.email}</span>
-                  </div>
+                  <Space size="small">
+                    <Mail style={{ color: "#8c8c8c", fontSize: 14 }} />
+                    <Text type="secondary" style={{ fontSize: 14 }} ellipsis>
+                      {customer.email}
+                    </Text>
+                  </Space>
                 )}
-              </div>
+              </Space>
 
-              <div className="grid grid-cols-3 gap-3 pt-4 border-t border-border">
-                <div className="text-center">
-                  <p className="font-mono font-semibold">
+              <Row gutter={8} style={{ paddingTop: 16, borderTop: "1px solid #e5e7eb" }}>
+                <Col span={8} style={{ textAlign: "center" }}>
+                  <Text strong style={{ fontFamily: "'JetBrains Mono', ui-monospace, monospace", display: "block" }}>
                     ₦{(customer.totalSpent / 1000000).toFixed(1)}M
-                  </p>
-                  <p className="text-xs text-muted-foreground">Total Spent</p>
-                </div>
-                <div className="text-center">
-                  <div className="flex items-center justify-center gap-1">
-                    <ShoppingBag className="h-3.5 w-3.5 text-muted-foreground" />
-                    <span className="font-mono font-semibold">
+                  </Text>
+                  <Text type="secondary" style={{ fontSize: 12 }}>
+                    Total Spent
+                  </Text>
+                </Col>
+                <Col span={8} style={{ textAlign: "center" }}>
+                  <Space size="small" style={{ justifyContent: "center" }}>
+                    <ShoppingBag style={{ color: "#8c8c8c", fontSize: 14 }} />
+                    <Text strong style={{ fontFamily: "'JetBrains Mono', ui-monospace, monospace" }}>
                       {customer.purchaseCount}
-                    </span>
-                  </div>
-                  <p className="text-xs text-muted-foreground">Purchases</p>
-                </div>
-                <div className="text-center">
-                  <div className="flex items-center justify-center gap-1">
-                    <Wrench className="h-3.5 w-3.5 text-muted-foreground" />
-                    <span className="font-mono font-semibold">
+                    </Text>
+                  </Space>
+                  <Text type="secondary" style={{ fontSize: 12, display: "block" }}>
+                    Purchases
+                  </Text>
+                </Col>
+                <Col span={8} style={{ textAlign: "center" }}>
+                  <Space size="small" style={{ justifyContent: "center" }}>
+                    <Wrench style={{ color: "#8c8c8c", fontSize: 14 }} />
+                    <Text strong style={{ fontFamily: "'JetBrains Mono', ui-monospace, monospace" }}>
                       {customer.repairCount}
-                    </span>
-                  </div>
-                  <p className="text-xs text-muted-foreground">Repairs</p>
-                </div>
-              </div>
+                    </Text>
+                  </Space>
+                  <Text type="secondary" style={{ fontSize: 12, display: "block" }}>
+                    Repairs
+                  </Text>
+                </Col>
+              </Row>
 
               {customer.tags.length > 0 && (
-                <div className="flex flex-wrap gap-1 mt-4">
+                <div style={{ marginTop: 16, display: "flex", flexWrap: "wrap", gap: 8 }}>
                   {customer.tags.map((tag) => (
-                    <Badge
-                      key={tag}
-                      variant="outline"
-                      className="text-xs font-normal"
-                    >
+                    <Tag key={tag} style={{ margin: 0 }}>
                       {tag}
-                    </Badge>
+                    </Tag>
                   ))}
                 </div>
               )}
-            </CardContent>
-          </Card>
+            </Card>
+          </Col>
         ))}
-      </div>
+      </Row>
     </DashboardLayout>
   );
 };

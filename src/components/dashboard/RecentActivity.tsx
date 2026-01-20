@@ -1,6 +1,7 @@
 import { ShoppingCart, Wrench, TrendingUp, CreditCard, Package } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
+import { Card, Typography, Avatar } from "antd";
+
+const { Title, Text } = Typography;
 
 const activities = [
   {
@@ -10,6 +11,7 @@ const activities = [
     description: "iPhone 15 Pro Max - N850,000",
     time: "2 mins ago",
     icon: ShoppingCart,
+    color: "#52c41a",
   },
   {
     id: 2,
@@ -18,6 +20,7 @@ const activities = [
     description: "Screen replacement - Samsung S23",
     time: "15 mins ago",
     icon: Wrench,
+    color: "#1890ff",
   },
   {
     id: 3,
@@ -26,6 +29,7 @@ const activities = [
     description: "Chief Okafor - ₦5,000,000",
     time: "1 hour ago",
     icon: TrendingUp,
+    color: "#1976d2",
   },
   {
     id: 4,
@@ -34,6 +38,7 @@ const activities = [
     description: "Wholesale order - TechMart Ltd",
     time: "2 hours ago",
     icon: CreditCard,
+    color: "#000000",
   },
   {
     id: 5,
@@ -42,54 +47,60 @@ const activities = [
     description: "PO #1245 - 50 units",
     time: "3 hours ago",
     icon: Package,
+    color: "#8c8c8c",
   },
 ];
 
-const typeStyles = {
-  sale: "bg-success/10 text-success",
-  repair: "bg-info/10 text-info",
-  investment: "bg-accent/10 text-accent",
-  payment: "bg-primary/10 text-primary",
-  stock: "bg-secondary text-secondary-foreground",
-};
-
 export function RecentActivity() {
   return (
-    <Card className="border-border/50">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-base font-semibold">Recent Activity</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          {activities.map((activity, index) => (
-            <div
-              key={activity.id}
-              className={cn(
-                "flex items-start gap-4 animate-fade-in",
-              )}
-              style={{ animationDelay: `${index * 50}ms` }}
-            >
-              <div
-                className={cn(
-                  "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg",
-                  typeStyles[activity.type as keyof typeof typeStyles]
-                )}
+    <Card
+      style={{ borderRadius: 12, border: "1px solid #e5e7eb" }}
+      styles={{
+        header: { borderBottom: "1px solid #e5e7eb", padding: "16px 24px" },
+        body: { padding: 24 },
+      }}
+      title={<Title level={5} style={{ margin: 0 }}>Recent Activity</Title>}
+    >
+      <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+        {activities.map((activity) => (
+          <div
+            key={activity.id}
+            style={{
+              display: "flex",
+              alignItems: "flex-start",
+              gap: 16,
+            }}
+          >
+            <Avatar
+              size={36}
+              style={{
+                backgroundColor: `${activity.color}15`,
+                color: activity.color,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                borderRadius: 8,
+              }}
+              icon={<activity.icon style={{ width: 16, height: 16 }} />}
+            />
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <Text strong style={{ fontSize: 14, display: "block" }}>
+                {activity.title}
+              </Text>
+              <Text
+                type="secondary"
+                style={{ fontSize: 14, display: "block" }}
+                ellipsis
               >
-                <activity.icon className="h-4 w-4" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium">{activity.title}</p>
-                <p className="text-sm text-muted-foreground truncate">
-                  {activity.description}
-                </p>
-              </div>
-              <span className="text-xs text-muted-foreground whitespace-nowrap">
-                {activity.time}
-              </span>
+                {activity.description}
+              </Text>
             </div>
-          ))}
-        </div>
-      </CardContent>
+            <Text type="secondary" style={{ fontSize: 12, whiteSpace: "nowrap" }}>
+              {activity.time}
+            </Text>
+          </div>
+        ))}
+      </div>
     </Card>
   );
 }

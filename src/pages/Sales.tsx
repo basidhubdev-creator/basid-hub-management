@@ -3,7 +3,6 @@ import {
   Search,
   Plus,
   Minus,
-  Trash2,
   User,
   CreditCard,
   Banknote,
@@ -13,19 +12,20 @@ import {
   ShoppingCart,
 } from "lucide-react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { cn } from "@/lib/utils";
+  Card,
+  Input,
+  Button,
+  Badge,
+  Typography,
+  Space,
+  Row,
+  Col,
+  Divider,
+  Radio,
+} from "antd";
+
+const { Title, Text } = Typography;
 
 interface Product {
   id: string;
@@ -68,7 +68,6 @@ const Sales = () => {
   const [selectedPayment, setSelectedPayment] = useState<string>("cash");
   const [amountPaid, setAmountPaid] = useState("");
   const [customerName, setCustomerName] = useState("");
-  const [showCheckout, setShowCheckout] = useState(false);
 
   const filteredProducts = products.filter((product) => {
     const matchesSearch =
@@ -114,7 +113,7 @@ const Sales = () => {
     0
   );
   const totalDiscount = cart.reduce((sum, item) => sum + item.discount, 0);
-  const tax = 0; // Can be configured
+  const tax = 0;
   const grandTotal = subtotal - totalDiscount + tax;
   const change =
     amountPaid && parseFloat(amountPaid) > grandTotal
@@ -122,270 +121,290 @@ const Sales = () => {
       : 0;
 
   const handleCheckout = () => {
-    // Handle checkout logic
     setCart([]);
     setAmountPaid("");
     setCustomerName("");
-    setShowCheckout(false);
+  };
+
+  const categoryColors = {
+    phone: { color: "#000000", bg: "#00000015" },
+    accessory: { color: "#1890ff", bg: "#1890ff15" },
+    service: { color: "#52c41a", bg: "#52c41a15" },
   };
 
   return (
     <DashboardLayout title="Sales / POS" description="Create new sales and process payments">
-      <div className="flex gap-6 h-[calc(100vh-10rem)]">
+      <Row gutter={24} style={{ height: "calc(100vh - 10rem)" }}>
         {/* Products Section */}
-        <div className="flex-1 flex flex-col">
+        <Col flex="1 1 0" style={{ display: "flex", flexDirection: "column" }}>
           {/* Search & Filters */}
-          <div className="flex items-center gap-3 mb-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search by name, SKU, or IMEI..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9 h-10 bg-card border-border/50"
-              />
-            </div>
-            <div className="flex gap-1 p-1 bg-secondary rounded-lg">
-              {[
-                { id: "all", label: "All" },
-                { id: "phone", label: "Phones" },
-                { id: "accessory", label: "Accessories" },
-                { id: "service", label: "Services" },
-              ].map((cat) => (
-                <button
-                  key={cat.id}
-                  onClick={() => setActiveCategory(cat.id)}
-                  className={cn(
-                    "px-3 py-1.5 text-sm font-medium rounded-md transition-colors",
-                    activeCategory === cat.id
-                      ? "bg-card text-foreground shadow-sm"
-                      : "text-muted-foreground hover:text-foreground"
-                  )}
-                >
-                  {cat.label}
-                </button>
-              ))}
-            </div>
-          </div>
+          <Space style={{ marginBottom: 16 }}>
+            <Input
+              placeholder="Search by name, SKU, or IMEI..."
+              prefix={<Search style={{ color: "#8c8c8c" }} />}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={{ width: 400 }}
+            />
+            <Radio.Group
+              value={activeCategory}
+              onChange={(e) => setActiveCategory(e.target.value)}
+              buttonStyle="solid"
+            >
+              <Radio.Button value="all">All</Radio.Button>
+              <Radio.Button value="phone">Phones</Radio.Button>
+              <Radio.Button value="accessory">Accessories</Radio.Button>
+              <Radio.Button value="service">Services</Radio.Button>
+            </Radio.Group>
+          </Space>
 
           {/* Products Grid */}
-          <div className="flex-1 overflow-auto">
-            <div className="grid grid-cols-2 xl:grid-cols-3 gap-3">
-              {filteredProducts.map((product) => (
-                <button
-                  key={product.id}
-                  onClick={() => addToCart(product)}
-                  className="text-left p-4 rounded-xl border border-border/50 bg-card hover:border-accent/50 hover:shadow-md transition-all group"
-                >
-                  <div className="flex items-start justify-between mb-2">
-                    <Badge
-                      variant="secondary"
-                      className={cn(
-                        "text-xs",
-                        product.category === "phone" && "bg-primary/10 text-primary",
-                        product.category === "accessory" && "bg-info/10 text-info",
-                        product.category === "service" && "bg-success/10 text-success"
-                      )}
+          <div style={{ flex: 1, overflow: "auto" }}>
+            <Row gutter={[12, 12]}>
+              {filteredProducts.map((product) => {
+                const catColor = categoryColors[product.category];
+                return (
+                  <Col xs={24} sm={12} xl={8} key={product.id}>
+                    <Card
+                      hoverable
+                      onClick={() => addToCart(product)}
+                      style={{
+                        borderRadius: 12,
+                        border: "1px solid #e5e7eb",
+                        cursor: "pointer",
+                      }}
+                      bodyStyle={{ padding: 16 }}
                     >
-                      {product.category}
-                    </Badge>
-                    {product.condition && (
-                      <Badge
-                        variant="outline"
-                        className={cn(
-                          "text-xs",
-                          product.condition === "used" && "border-warning text-warning"
-                        )}
+                      <Space
+                        direction="vertical"
+                        size="small"
+                        style={{ width: "100%" }}
                       >
-                        {product.condition}
-                      </Badge>
-                    )}
-                  </div>
-                  <h3 className="font-medium text-sm mb-1 group-hover:text-accent transition-colors">
-                    {product.name}
-                  </h3>
-                  <p className="text-xs text-muted-foreground mb-2">{product.sku}</p>
-                  <div className="flex items-center justify-between">
-                    <span className="font-mono font-semibold text-foreground">
-                      ₦{product.price.toLocaleString()}
-                    </span>
-                    <span className="text-xs text-muted-foreground">
-                      {product.stock} in stock
-                    </span>
-                  </div>
-                </button>
-              ))}
-            </div>
+                        <div style={{ display: "flex", justifyContent: "space-between" }}>
+                          <Badge
+                            style={{
+                              background: catColor.bg,
+                              color: catColor.color,
+                              border: "none",
+                              padding: "4px 8px",
+                            }}
+                          >
+                            {product.category}
+                          </Badge>
+                          {product.condition && (
+                            <Badge
+                              style={{
+                                borderColor: product.condition === "used" ? "#faad14" : undefined,
+                                color: product.condition === "used" ? "#faad14" : undefined,
+                              }}
+                            >
+                              {product.condition}
+                            </Badge>
+                          )}
+                        </div>
+                        <Title level={5} style={{ margin: 0, fontSize: 14 }}>
+                          {product.name}
+                        </Title>
+                        <Text type="secondary" style={{ fontSize: 12 }}>
+                          {product.sku}
+                        </Text>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                          <Text strong style={{ fontFamily: "'JetBrains Mono', ui-monospace, monospace" }}>
+                            ₦{product.price.toLocaleString()}
+                          </Text>
+                          <Text type="secondary" style={{ fontSize: 12 }}>
+                            {product.stock} in stock
+                          </Text>
+                        </div>
+                      </Space>
+                    </Card>
+                  </Col>
+                );
+              })}
+            </Row>
           </div>
-        </div>
+        </Col>
 
         {/* Cart Section */}
-        <Card className="w-[400px] flex flex-col border-border/50">
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-base flex items-center gap-2">
-                <ShoppingCart className="h-4 w-4" />
+        <Col span={8}>
+          <Card
+            title={
+              <Space>
+                <ShoppingCart />
                 Cart
-                {cart.length > 0 && (
-                  <Badge variant="secondary" className="ml-1">
-                    {cart.reduce((sum, item) => sum + item.quantity, 0)}
-                  </Badge>
-                )}
-              </CardTitle>
-              {cart.length > 0 && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setCart([])}
-                  className="text-muted-foreground hover:text-destructive"
-                >
+                {cart.length > 0 && <Badge count={cart.reduce((sum, item) => sum + item.quantity, 0)} />}
+              </Space>
+            }
+            extra={
+              cart.length > 0 && (
+                <Button type="text" danger onClick={() => setCart([])}>
                   Clear
                 </Button>
-              )}
-            </div>
-          </CardHeader>
-
-          <CardContent className="flex-1 flex flex-col overflow-hidden">
+              )
+            }
+            style={{ height: "100%", display: "flex", flexDirection: "column" }}
+            bodyStyle={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}
+          >
             {/* Customer Selector */}
-            <div className="mb-4">
-              <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Walk-in customer or search..."
-                  value={customerName}
-                  onChange={(e) => setCustomerName(e.target.value)}
-                  className="pl-9 h-9 text-sm"
-                />
-              </div>
-            </div>
+            <Input
+              placeholder="Walk-in customer or search..."
+              prefix={<User style={{ color: "#8c8c8c" }} />}
+              value={customerName}
+              onChange={(e) => setCustomerName(e.target.value)}
+              style={{ marginBottom: 16 }}
+            />
 
             {/* Cart Items */}
-            <div className="flex-1 overflow-auto space-y-2 mb-4">
+            <div style={{ flex: 1, overflow: "auto", marginBottom: 16 }}>
               {cart.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-full text-center py-12">
-                  <ShoppingCart className="h-12 w-12 text-muted-foreground/30 mb-3" />
-                  <p className="text-sm text-muted-foreground">Cart is empty</p>
-                  <p className="text-xs text-muted-foreground/70">
+                <div style={{ textAlign: "center", padding: "48px 0" }}>
+                  <ShoppingCart style={{ fontSize: 48, color: "#d9d9d9", marginBottom: 12 }} />
+                  <Text type="secondary">Cart is empty</Text>
+                  <br />
+                  <Text type="secondary" style={{ fontSize: 12 }}>
                     Click products to add them
-                  </p>
+                  </Text>
                 </div>
               ) : (
-                cart.map((item) => (
-                  <div
-                    key={item.id}
-                    className="flex items-start gap-3 p-3 rounded-lg bg-secondary/50"
-                  >
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">{item.name}</p>
-                      <p className="text-xs text-muted-foreground">
-                        ₦{item.price.toLocaleString()} each
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="flex items-center gap-1 bg-card rounded-md border">
-                        <button
-                          onClick={() => updateQuantity(item.id, -1)}
-                          className="p-1.5 hover:bg-muted rounded-l-md transition-colors"
-                        >
-                          <Minus className="h-3 w-3" />
-                        </button>
-                        <span className="w-8 text-center text-sm font-medium">
-                          {item.quantity}
-                        </span>
-                        <button
-                          onClick={() => updateQuantity(item.id, 1)}
-                          className="p-1.5 hover:bg-muted rounded-r-md transition-colors"
-                        >
-                          <Plus className="h-3 w-3" />
-                        </button>
-                      </div>
-                      <button
-                        onClick={() => removeFromCart(item.id)}
-                        className="p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-md transition-colors"
-                      >
-                        <X className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </div>
-                ))
+                <Space direction="vertical" size="small" style={{ width: "100%" }}>
+                  {cart.map((item) => (
+                    <Card
+                      key={item.id}
+                      size="small"
+                      style={{ background: "#fafafa" }}
+                      bodyStyle={{ padding: 12 }}
+                    >
+                      <Space style={{ width: "100%", justifyContent: "space-between" }}>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <Text strong style={{ display: "block", fontSize: 14 }}>
+                            {item.name}
+                          </Text>
+                          <Text type="secondary" style={{ fontSize: 12 }}>
+                            ₦{item.price.toLocaleString()} each
+                          </Text>
+                        </div>
+                        <Space>
+                          <Space.Compact>
+                            <Button
+                              icon={<Minus />}
+                              onClick={() => updateQuantity(item.id, -1)}
+                              size="small"
+                            />
+                            <Input
+                              readOnly
+                              value={item.quantity}
+                              style={{
+                                width: 50,
+                                textAlign: "center",
+                                fontWeight: 500,
+                              }}
+                            />
+                            <Button
+                              icon={<Plus />}
+                              onClick={() => updateQuantity(item.id, 1)}
+                              size="small"
+                            />
+                          </Space.Compact>
+                          <Button
+                            type="text"
+                            danger
+                            icon={<X />}
+                            onClick={() => removeFromCart(item.id)}
+                            size="small"
+                          />
+                        </Space>
+                      </Space>
+                    </Card>
+                  ))}
+                </Space>
               )}
             </div>
 
             {/* Totals */}
-            <div className="space-y-2 pt-4 border-t">
-              <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Subtotal</span>
-                <span className="font-mono">₦{subtotal.toLocaleString()}</span>
-              </div>
-              {totalDiscount > 0 && (
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Discount</span>
-                  <span className="font-mono text-success">
-                    -₦{totalDiscount.toLocaleString()}
-                  </span>
+            <div>
+              <Space direction="vertical" size="small" style={{ width: "100%", marginBottom: 16 }}>
+                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                  <Text type="secondary">Subtotal</Text>
+                  <Text strong style={{ fontFamily: "'JetBrains Mono', ui-monospace, monospace" }}>
+                    ₦{subtotal.toLocaleString()}
+                  </Text>
                 </div>
-              )}
-              <Separator className="my-2" />
-              <div className="flex justify-between">
-                <span className="font-semibold">Total</span>
-                <span className="font-mono font-bold text-lg">
-                  ₦{grandTotal.toLocaleString()}
-                </span>
-              </div>
-            </div>
+                {totalDiscount > 0 && (
+                  <div style={{ display: "flex", justifyContent: "space-between" }}>
+                    <Text type="secondary">Discount</Text>
+                    <Text strong style={{ color: "#52c41a", fontFamily: "'JetBrains Mono', ui-monospace, monospace" }}>
+                      -₦{totalDiscount.toLocaleString()}
+                    </Text>
+                  </div>
+                )}
+                <Divider style={{ margin: "8px 0" }} />
+                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                  <Text strong>Total</Text>
+                  <Title level={4} style={{ margin: 0, fontFamily: "'JetBrains Mono', ui-monospace, monospace" }}>
+                    ₦{grandTotal.toLocaleString()}
+                  </Title>
+                </div>
+              </Space>
 
-            {/* Payment Methods */}
-            <div className="grid grid-cols-3 gap-2 mt-4">
-              {paymentMethods.map((method) => (
-                <button
-                  key={method.id}
-                  onClick={() => setSelectedPayment(method.id)}
-                  className={cn(
-                    "flex flex-col items-center gap-1 p-3 rounded-lg border transition-all",
-                    selectedPayment === method.id
-                      ? "border-accent bg-accent/10 text-accent"
-                      : "border-border hover:border-accent/50"
-                  )}
-                >
-                  <method.icon className="h-5 w-5" />
-                  <span className="text-xs font-medium">{method.name}</span>
-                </button>
-              ))}
-            </div>
+              {/* Payment Methods */}
+              <Radio.Group
+                value={selectedPayment}
+                onChange={(e) => setSelectedPayment(e.target.value)}
+                style={{ width: "100%", marginBottom: 16 }}
+              >
+                <Row gutter={8}>
+                  {paymentMethods.map((method) => {
+                    const MethodIcon = method.icon;
+                    return (
+                      <Col span={8} key={method.id}>
+                        <Radio.Button value={method.id} style={{ width: "100%", textAlign: "center", height: 64, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+                          <MethodIcon style={{ fontSize: 20, marginBottom: 4 }} />
+                          <Text style={{ fontSize: 12 }}>{method.name}</Text>
+                        </Radio.Button>
+                      </Col>
+                    );
+                  })}
+                </Row>
+              </Radio.Group>
 
-            {/* Amount Input */}
-            <div className="mt-4">
+              {/* Amount Input */}
               <Input
                 type="number"
                 placeholder="Amount paid"
                 value={amountPaid}
                 onChange={(e) => setAmountPaid(e.target.value)}
-                className="h-11 text-center font-mono text-lg"
+                style={{
+                  textAlign: "center",
+                  fontFamily: "'JetBrains Mono', ui-monospace, monospace",
+                  fontSize: 18,
+                  marginBottom: 8,
+                }}
               />
               {change > 0 && (
-                <p className="text-center text-sm text-success mt-2">
+                <Text style={{ display: "block", textAlign: "center", color: "#52c41a", marginBottom: 16 }}>
                   Change: ₦{change.toLocaleString()}
-                </p>
+                </Text>
               )}
-            </div>
 
-            {/* Action Buttons */}
-            <div className="grid grid-cols-2 gap-2 mt-4">
-              <Button variant="outline" disabled={cart.length === 0}>
-                Save Draft
-              </Button>
-              <Button
-                className="bg-primary hover:bg-primary/90"
-                disabled={cart.length === 0}
-                onClick={handleCheckout}
-              >
-                <Receipt className="mr-2 h-4 w-4" />
-                Complete
-              </Button>
+              {/* Action Buttons */}
+              <Space style={{ width: "100%" }} size="small">
+                <Button block disabled={cart.length === 0}>
+                  Save Draft
+                </Button>
+                <Button
+                  type="primary"
+                  block
+                  icon={<Receipt />}
+                  disabled={cart.length === 0}
+                  onClick={handleCheckout}
+                >
+                  Complete
+                </Button>
+              </Space>
             </div>
-          </CardContent>
-        </Card>
-      </div>
+          </Card>
+        </Col>
+      </Row>
     </DashboardLayout>
   );
 };

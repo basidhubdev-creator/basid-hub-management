@@ -12,34 +12,26 @@ import {
   User,
   Calendar,
   MoreHorizontal,
-  ChevronRight,
 } from "lucide-react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import {
+  Button,
+  Input,
+  Badge,
   Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
   Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { cn } from "@/lib/utils";
+  Typography,
+  Space,
+  Row,
+  Col,
+  Card,
+  Dropdown,
+  Avatar,
+} from "antd";
+import type { ColumnsType } from "antd/es/table";
+
+const { Option } = Select;
+const { Text } = Typography;
 
 interface RepairTicket {
   id: string;
@@ -143,14 +135,14 @@ const tickets: RepairTicket[] = [
   },
 ];
 
-const statusConfig = {
-  new: { label: "New", color: "bg-info/10 text-info", icon: AlertCircle },
-  diagnosing: { label: "Diagnosing", color: "bg-warning/10 text-warning", icon: Wrench },
-  waiting_parts: { label: "Waiting Parts", color: "bg-destructive/10 text-destructive", icon: Clock },
-  in_progress: { label: "In Progress", color: "bg-accent/10 text-accent", icon: Wrench },
-  ready: { label: "Ready", color: "bg-success/10 text-success", icon: CheckCircle2 },
-  completed: { label: "Completed", color: "bg-muted text-muted-foreground", icon: CheckCircle2 },
-  cancelled: { label: "Cancelled", color: "bg-muted text-muted-foreground", icon: AlertCircle },
+const statusConfig: Record<string, { label: string; color: string; icon: React.ComponentType<{ className?: string }> }> = {
+  new: { label: "New", color: "#1890ff", icon: AlertCircle },
+  diagnosing: { label: "Diagnosing", color: "#faad14", icon: Wrench },
+  waiting_parts: { label: "Waiting Parts", color: "#ff4d4f", icon: Clock },
+  in_progress: { label: "In Progress", color: "#1976d2", icon: Wrench },
+  ready: { label: "Ready", color: "#52c41a", icon: CheckCircle2 },
+  completed: { label: "Completed", color: "#8c8c8c", icon: CheckCircle2 },
+  cancelled: { label: "Cancelled", color: "#8c8c8c", icon: AlertCircle },
 };
 
 const Repairs = () => {
@@ -176,179 +168,213 @@ const Repairs = () => {
     completed: tickets.filter((t) => t.status === "completed").length,
   };
 
+  const columns: ColumnsType<RepairTicket> = [
+    {
+      title: "Ticket ID",
+      dataIndex: "id",
+      width: 120,
+      render: (id: string) => (
+        <Link
+          to={`/repairs/${id}`}
+          style={{
+            fontFamily: "'JetBrains Mono', ui-monospace, monospace",
+            fontWeight: 500,
+            color: "#1976d2",
+          }}
+        >
+          {id}
+        </Link>
+      ),
+    },
+    {
+      title: "Customer",
+      dataIndex: "customer",
+      render: (_: string, record: RepairTicket) => (
+        <Space>
+          <Avatar size="small" icon={<User />} style={{ backgroundColor: "#f5f5f5", color: "#8c8c8c" }} />
+          <div>
+            <Text strong style={{ fontSize: 14 }}>
+              {record.customer}
+            </Text>
+            <br />
+            <Text type="secondary" style={{ fontSize: 12 }}>
+              {record.phone}
+            </Text>
+          </div>
+        </Space>
+      ),
+    },
+    {
+      title: "Device",
+      dataIndex: "device",
+      render: (device: string) => (
+        <Space>
+          <Phone style={{ color: "#8c8c8c", fontSize: 14 }} />
+          <Text style={{ fontSize: 14 }}>{device}</Text>
+        </Space>
+      ),
+    },
+    {
+      title: "Issue",
+      dataIndex: "issue",
+      ellipsis: { showTitle: false },
+      render: (issue: string) => (
+        <Text style={{ fontSize: 14 }} ellipsis={{ tooltip: issue }}>
+          {issue}
+        </Text>
+      ),
+    },
+    {
+      title: "Status",
+      dataIndex: "status",
+      render: (status: string) => {
+        const config = statusConfig[status];
+        const StatusIcon = config.icon;
+        return (
+          <Badge
+            color={config.color}
+            text={
+              <Space size="small">
+                <StatusIcon className="h-4 w-4" />
+                {config.label}
+              </Space>
+            }
+          />
+        );
+      },
+    },
+    {
+      title: "Technician",
+      dataIndex: "technician",
+      render: (technician: string) => (
+        <Text style={{ fontSize: 14 }}>
+          {technician || <Text type="secondary" italic>Unassigned</Text>}
+        </Text>
+      ),
+    },
+    {
+      title: "Due Date",
+      dataIndex: "dueDate",
+      render: (date: string) => (
+        <Space size="small">
+          <Calendar style={{ color: "#8c8c8c", fontSize: 12 }} />
+          <Text style={{ fontSize: 14 }}>{date}</Text>
+        </Space>
+      ),
+    },
+    {
+      title: "Balance",
+      align: "right",
+      render: (_: string, record: RepairTicket) => {
+        const balance = record.total - record.paid;
+        return balance > 0 ? (
+          <Text strong style={{ fontFamily: "'JetBrains Mono', ui-monospace, monospace", color: "#ff4d4f" }}>
+            ₦{balance.toLocaleString()}
+          </Text>
+        ) : (
+          <Text strong style={{ fontFamily: "'JetBrains Mono', ui-monospace, monospace", color: "#52c41a" }}>
+            Paid
+          </Text>
+        );
+      },
+    },
+    {
+      title: "",
+      width: 50,
+      render: () => (
+        <Dropdown
+          menu={{
+            items: [
+              { key: "view", label: "View Details" },
+              { key: "update", label: "Update Status" },
+              { key: "payment", label: "Add Payment" },
+              { key: "print", label: "Print Ticket" },
+            ],
+          }}
+          trigger={["click"]}
+        >
+          <Button type="text" icon={<MoreHorizontal />} />
+        </Dropdown>
+      ),
+    },
+  ];
+
   return (
     <DashboardLayout title="Repairs" description="Manage repair tickets and track progress">
       {/* Status Overview Cards */}
-      <div className="grid grid-cols-5 gap-4 mb-6">
+      <Row gutter={16} style={{ marginBottom: 24 }}>
         {[
-          { key: "all", label: "All Tickets", color: "border-border" },
-          { key: "new", label: "New", color: "border-info" },
-          { key: "in_progress", label: "In Progress", color: "border-accent" },
-          { key: "ready", label: "Ready", color: "border-success" },
-          { key: "completed", label: "Completed", color: "border-muted" },
+          { key: "all", label: "All Tickets", color: "#e5e7eb" },
+          { key: "new", label: "New", color: "#1890ff" },
+          { key: "in_progress", label: "In Progress", color: "#1976d2" },
+          { key: "ready", label: "Ready", color: "#52c41a" },
+          { key: "completed", label: "Completed", color: "#8c8c8c" },
         ].map((status) => (
-          <button
-            key={status.key}
-            onClick={() => setStatusFilter(status.key)}
-            className={cn(
-              "p-4 rounded-xl border-2 text-left transition-all",
-              statusFilter === status.key
-                ? `${status.color} bg-card shadow-md`
-                : "border-transparent bg-card/50 hover:bg-card"
-            )}
-          >
-            <p className="text-2xl font-bold font-mono">
-              {statusCounts[status.key as keyof typeof statusCounts]}
-            </p>
-            <p className="text-sm text-muted-foreground">{status.label}</p>
-          </button>
+          <Col span={4} key={status.key}>
+            <Card
+              hoverable
+              onClick={() => setStatusFilter(status.key)}
+              style={{
+                borderRadius: 12,
+                border: `2px solid ${statusFilter === status.key ? status.color : "transparent"}`,
+                cursor: "pointer",
+                background: statusFilter === status.key ? "#fff" : "#fafafa",
+              }}
+              bodyStyle={{ padding: 16 }}
+            >
+              <Text strong style={{ fontSize: 24, fontFamily: "'JetBrains Mono', ui-monospace, monospace", display: "block", marginBottom: 4 }}>
+                {statusCounts[status.key as keyof typeof statusCounts]}
+              </Text>
+              <Text type="secondary" style={{ fontSize: 14 }}>
+                {status.label}
+              </Text>
+            </Card>
+          </Col>
         ))}
-      </div>
+      </Row>
 
       {/* Actions Bar */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-3">
-          <div className="relative w-80">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search tickets, customers, IMEI..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9 h-10 bg-card border-border/50"
-            />
-          </div>
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-[150px] h-10 bg-card border-border/50">
-              <Filter className="mr-2 h-4 w-4" />
-              <SelectValue placeholder="Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="new">New</SelectItem>
-              <SelectItem value="diagnosing">Diagnosing</SelectItem>
-              <SelectItem value="waiting_parts">Waiting Parts</SelectItem>
-              <SelectItem value="in_progress">In Progress</SelectItem>
-              <SelectItem value="ready">Ready</SelectItem>
-              <SelectItem value="completed">Completed</SelectItem>
-            </SelectContent>
+      <Space style={{ marginBottom: 16, width: "100%", justifyContent: "space-between" }}>
+        <Space>
+          <Input
+            placeholder="Search tickets, customers, IMEI..."
+            prefix={<Search style={{ color: "#8c8c8c" }} />}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={{ width: 320 }}
+          />
+          <Select
+            value={statusFilter}
+            onChange={setStatusFilter}
+            style={{ width: 150 }}
+            suffixIcon={<Filter style={{ color: "#8c8c8c" }} />}
+          >
+            <Option value="all">All Status</Option>
+            <Option value="new">New</Option>
+            <Option value="diagnosing">Diagnosing</Option>
+            <Option value="waiting_parts">Waiting Parts</Option>
+            <Option value="in_progress">In Progress</Option>
+            <Option value="ready">Ready</Option>
+            <Option value="completed">Completed</Option>
           </Select>
-        </div>
+        </Space>
         <Link to="/repairs/new">
-          <Button className="bg-primary hover:bg-primary/90">
-            <Plus className="mr-2 h-4 w-4" />
+          <Button type="primary" icon={<Plus />}>
             New Ticket
           </Button>
         </Link>
-      </div>
+      </Space>
 
       {/* Tickets Table */}
-      <div className="rounded-xl border border-border/50 bg-card overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow className="hover:bg-transparent">
-              <TableHead className="w-[100px]">Ticket ID</TableHead>
-              <TableHead>Customer</TableHead>
-              <TableHead>Device</TableHead>
-              <TableHead>Issue</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Technician</TableHead>
-              <TableHead>Due Date</TableHead>
-              <TableHead className="text-right">Balance</TableHead>
-              <TableHead className="w-[50px]"></TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredTickets.map((ticket) => {
-              const status = statusConfig[ticket.status];
-              const StatusIcon = status.icon;
-              const balance = ticket.total - ticket.paid;
-
-              return (
-                <TableRow
-                  key={ticket.id}
-                  className="cursor-pointer group"
-                >
-                  <TableCell>
-                    <Link
-                      to={`/repairs/${ticket.id}`}
-                      className="font-mono font-medium text-accent hover:underline"
-                    >
-                      {ticket.id}
-                    </Link>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-3">
-                      <div className="h-8 w-8 rounded-full bg-secondary flex items-center justify-center">
-                        <User className="h-4 w-4 text-muted-foreground" />
-                      </div>
-                      <div>
-                        <p className="font-medium text-sm">{ticket.customer}</p>
-                        <p className="text-xs text-muted-foreground">{ticket.phone}</p>
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <Phone className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm">{ticket.device}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <p className="text-sm truncate max-w-[200px]">{ticket.issue}</p>
-                  </TableCell>
-                  <TableCell>
-                    <Badge className={cn("gap-1", status.color)}>
-                      <StatusIcon className="h-3 w-3" />
-                      {status.label}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <span className="text-sm">
-                      {ticket.technician || (
-                        <span className="text-muted-foreground italic">Unassigned</span>
-                      )}
-                    </span>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2 text-sm">
-                      <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
-                      {ticket.dueDate}
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    {balance > 0 ? (
-                      <span className="font-mono text-sm text-destructive">
-                        ₦{balance.toLocaleString()}
-                      </span>
-                    ) : (
-                      <span className="font-mono text-sm text-success">Paid</span>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 opacity-0 group-hover:opacity-100"
-                        >
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem>View Details</DropdownMenuItem>
-                        <DropdownMenuItem>Update Status</DropdownMenuItem>
-                        <DropdownMenuItem>Add Payment</DropdownMenuItem>
-                        <DropdownMenuItem>Print Ticket</DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      </div>
+      <Card style={{ borderRadius: 12, border: "1px solid #e5e7eb" }} bodyStyle={{ padding: 0 }}>
+        <Table
+          columns={columns}
+          dataSource={filteredTickets}
+          rowKey="id"
+          pagination={{ pageSize: 10 }}
+          scroll={{ x: "max-content" }}
+        />
+      </Card>
     </DashboardLayout>
   );
 };

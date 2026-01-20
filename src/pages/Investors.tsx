@@ -1,10 +1,17 @@
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { 
-  TrendingUp, 
-  DollarSign, 
-  Users, 
+import {
+  Card,
+  Button,
+  Typography,
+  Row,
+  Col,
+  Space,
+  Statistic,
+} from "antd";
+import {
+  TrendingUp,
+  DollarSign,
+  Users,
   ArrowUpRight,
   ArrowDownRight,
   Plus,
@@ -16,13 +23,14 @@ import {
   Area,
   AreaChart,
   Bar,
-  BarChart,
   CartesianGrid,
   ResponsiveContainer,
   Tooltip,
   XAxis,
   YAxis,
 } from "recharts";
+
+const { Title, Text } = Typography;
 
 const capitalData = [
   { month: "Jul", capital: 85000000, payouts: 5000000 },
@@ -51,186 +59,360 @@ const Investors = () => {
       description="Manage investor accounts, contributions, and payouts"
     >
       {/* KPI Cards */}
-      <div className="grid gap-4 md:grid-cols-4 mb-6">
-        <Card className="border-border/50">
-          <CardContent className="p-5">
-            <div className="flex items-center justify-between">
+      <Row gutter={16} style={{ marginBottom: 24 }}>
+        <Col xs={24} sm={12} lg={6}>
+          <Card
+            style={{ borderRadius: 12, border: "1px solid #e5e7eb" }}
+            bodyStyle={{ padding: 20 }}
+          >
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
               <div>
-                <p className="text-sm text-muted-foreground mb-1">Total Capital</p>
-                <p className="text-2xl font-bold font-mono">
-                  ₦{(totalCapital / 1000000).toFixed(1)}M
-                </p>
+                <Text type="secondary" style={{ fontSize: 14, display: "block", marginBottom: 4 }}>
+                  Total Capital
+                </Text>
+                <Statistic
+                  value={(totalCapital / 1000000).toFixed(1)}
+                  suffix="M"
+                  prefix="₦"
+                  valueStyle={{
+                    fontFamily: "'JetBrains Mono', ui-monospace, monospace",
+                    fontSize: 24,
+                    fontWeight: 700,
+                  }}
+                />
               </div>
-              <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                <DollarSign className="h-5 w-5 text-primary" />
+              <div
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 8,
+                  background: "#00000015",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <DollarSign style={{ fontSize: 20, color: "#000000" }} />
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </Card>
+        </Col>
 
-        <Card className="border-border/50">
-          <CardContent className="p-5">
-            <div className="flex items-center justify-between">
+        <Col xs={24} sm={12} lg={6}>
+          <Card
+            style={{ borderRadius: 12, border: "1px solid #e5e7eb" }}
+            bodyStyle={{ padding: 20 }}
+          >
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
               <div>
-                <p className="text-sm text-muted-foreground mb-1">Total Contributed</p>
-                <p className="text-2xl font-bold font-mono">
-                  ₦{(totalContributed / 1000000).toFixed(1)}M
-                </p>
+                <Text type="secondary" style={{ fontSize: 14, display: "block", marginBottom: 4 }}>
+                  Total Contributed
+                </Text>
+                <Statistic
+                  value={(totalContributed / 1000000).toFixed(1)}
+                  suffix="M"
+                  prefix="₦"
+                  valueStyle={{
+                    fontFamily: "'JetBrains Mono', ui-monospace, monospace",
+                    fontSize: 24,
+                    fontWeight: 700,
+                  }}
+                />
               </div>
-              <div className="h-10 w-10 rounded-lg bg-info/10 flex items-center justify-center">
-                <TrendingUp className="h-5 w-5 text-info" />
+              <div
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 8,
+                  background: "#1890ff15",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <TrendingUp style={{ fontSize: 20, color: "#1890ff" }} />
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </Card>
+        </Col>
 
-        <Card className="border-border/50">
-          <CardContent className="p-5">
-            <div className="flex items-center justify-between">
+        <Col xs={24} sm={12} lg={6}>
+          <Card
+            style={{ borderRadius: 12, border: "1px solid #e5e7eb" }}
+            bodyStyle={{ padding: 20 }}
+          >
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
               <div>
-                <p className="text-sm text-muted-foreground mb-1">Avg. ROI</p>
-                <p className="text-2xl font-bold font-mono text-success">
-                  {avgROI}%
-                </p>
+                <Text type="secondary" style={{ fontSize: 14, display: "block", marginBottom: 4 }}>
+                  Avg. ROI
+                </Text>
+                <Statistic
+                  value={avgROI}
+                  suffix="%"
+                  valueStyle={{
+                    fontFamily: "'JetBrains Mono', ui-monospace, monospace",
+                    fontSize: 24,
+                    fontWeight: 700,
+                    color: "#52c41a",
+                  }}
+                />
               </div>
-              <div className="h-10 w-10 rounded-lg bg-success/10 flex items-center justify-center">
-                <PieChart className="h-5 w-5 text-success" />
+              <div
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 8,
+                  background: "#52c41a15",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <PieChart style={{ fontSize: 20, color: "#52c41a" }} />
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </Card>
+        </Col>
 
-        <Card className="border-border/50">
-          <CardContent className="p-5">
-            <div className="flex items-center justify-between">
+        <Col xs={24} sm={12} lg={6}>
+          <Card
+            style={{ borderRadius: 12, border: "1px solid #e5e7eb" }}
+            bodyStyle={{ padding: 20 }}
+          >
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
               <div>
-                <p className="text-sm text-muted-foreground mb-1">Active Investors</p>
-                <p className="text-2xl font-bold font-mono">{investors.length}</p>
+                <Text type="secondary" style={{ fontSize: 14, display: "block", marginBottom: 4 }}>
+                  Active Investors
+                </Text>
+                <Statistic
+                  value={investors.length}
+                  valueStyle={{
+                    fontFamily: "'JetBrains Mono', ui-monospace, monospace",
+                    fontSize: 24,
+                    fontWeight: 700,
+                  }}
+                />
               </div>
-              <div className="h-10 w-10 rounded-lg bg-accent/10 flex items-center justify-center">
-                <Users className="h-5 w-5 text-accent" />
+              <div
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 8,
+                  background: "#1976d215",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Users style={{ fontSize: 20, color: "#1976d2" }} />
               </div>
             </div>
-          </CardContent>
-        </Card>
-      </div>
+          </Card>
+        </Col>
+      </Row>
 
-      <div className="grid gap-6 lg:grid-cols-3 mb-6">
+      <Row gutter={24} style={{ marginBottom: 24 }}>
         {/* Capital Chart */}
-        <Card className="lg:col-span-2 border-border/50">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base">Capital & Payouts Over Time</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-[280px]">
+        <Col xs={24} lg={16}>
+          <Card
+            style={{ borderRadius: 12, border: "1px solid #e5e7eb" }}
+            styles={{
+              header: { borderBottom: "1px solid #e5e7eb", padding: "16px 24px" },
+              body: { padding: 24 },
+            }}
+            title={<Title level={5} style={{ margin: 0 }}>Capital & Payouts Over Time</Title>}
+          >
+            <div style={{ height: 280 }}>
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={capitalData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                   <defs>
                     <linearGradient id="capitalGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="hsl(222, 47%, 20%)" stopOpacity={0.3} />
-                      <stop offset="100%" stopColor="hsl(222, 47%, 20%)" stopOpacity={0} />
+                      <stop offset="0%" stopColor="#000000" stopOpacity={0.2} />
+                      <stop offset="100%" stopColor="#000000" stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
-                  <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }} />
-                  <YAxis axisLine={false} tickLine={false} tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }} tickFormatter={(v) => `₦${(v / 1000000).toFixed(0)}M`} />
-                  <Tooltip
-                    contentStyle={{ backgroundColor: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: "8px" }}
-                    formatter={(value: number, name: string) => [`₦${value.toLocaleString()}`, name === "capital" ? "Capital" : "Payouts"]}
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
+                  <XAxis
+                    dataKey="month"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: "#8c8c8c", fontSize: 12 }}
                   />
-                  <Area type="monotone" dataKey="capital" stroke="hsl(222, 47%, 20%)" strokeWidth={2} fill="url(#capitalGrad)" />
-                  <Bar dataKey="payouts" fill="hsl(38, 92%, 50%)" radius={[4, 4, 0, 0]} barSize={20} />
+                  <YAxis
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: "#8c8c8c", fontSize: 12 }}
+                    tickFormatter={(v: number) => `₦${(v / 1000000).toFixed(0)}M`}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "#fff",
+                      border: "1px solid #e5e7eb",
+                      borderRadius: "8px",
+                    }}
+                    formatter={(value: number | undefined, name: string | undefined) => {
+                      if (value === undefined || name === undefined) return ["", ""];
+                      return [`₦${value.toLocaleString()}`, name === "capital" ? "Capital" : "Payouts"];
+                    }}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="capital"
+                    stroke="#000000"
+                    strokeWidth={2}
+                    fill="url(#capitalGrad)"
+                  />
+                  <Bar dataKey="payouts" fill="#1976d2" radius={[4, 4, 0, 0]} barSize={20} />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
-          </CardContent>
-        </Card>
+          </Card>
+        </Col>
 
         {/* Quick Actions */}
-        <Card className="border-border/50">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base">Quick Actions</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <Button variant="outline" className="w-full justify-start">
-              <Plus className="mr-2 h-4 w-4" />
-              Record Contribution
-            </Button>
-            <Button variant="outline" className="w-full justify-start">
-              <ArrowUpRight className="mr-2 h-4 w-4" />
-              Process Payout
-            </Button>
-            <Button variant="outline" className="w-full justify-start">
-              <History className="mr-2 h-4 w-4" />
-              View All Transactions
-            </Button>
-            <Button variant="outline" className="w-full justify-start">
-              <FileText className="mr-2 h-4 w-4" />
-              Generate Statements
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
+        <Col xs={24} lg={8}>
+          <Card
+            style={{ borderRadius: 12, border: "1px solid #e5e7eb" }}
+            styles={{
+              header: { borderBottom: "1px solid #e5e7eb", padding: "16px 24px" },
+              body: { padding: 24 },
+            }}
+            title={<Title level={5} style={{ margin: 0 }}>Quick Actions</Title>}
+          >
+            <Space direction="vertical" style={{ width: "100%" }} size="small">
+              <Button block icon={<Plus />} style={{ justifyContent: "flex-start" }}>
+                Record Contribution
+              </Button>
+              <Button block icon={<ArrowUpRight />} style={{ justifyContent: "flex-start" }}>
+                Process Payout
+              </Button>
+              <Button block icon={<History />} style={{ justifyContent: "flex-start" }}>
+                View All Transactions
+              </Button>
+              <Button block icon={<FileText />} style={{ justifyContent: "flex-start" }}>
+                Generate Statements
+              </Button>
+            </Space>
+          </Card>
+        </Col>
+      </Row>
 
       {/* Investors List */}
-      <Card className="border-border/50">
-        <CardHeader className="pb-2">
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-base">Investor Accounts</CardTitle>
-            <Button size="sm">
-              <Plus className="mr-2 h-4 w-4" />
+      <Card
+        style={{ borderRadius: 12, border: "1px solid #e5e7eb" }}
+        styles={{
+          header: { borderBottom: "1px solid #e5e7eb", padding: "16px 24px" },
+          body: { padding: 24 },
+        }}
+        title={
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <Title level={5} style={{ margin: 0 }}>Investor Accounts</Title>
+            <Button type="primary" icon={<Plus />} size="small">
               Add Investor
             </Button>
           </div>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {investors.map((investor) => {
-              const growth = investor.balance - investor.contributed;
-              const isPositive = growth >= 0;
+        }
+      >
+        <Space direction="vertical" style={{ width: "100%" }} size="middle">
+          {investors.map((investor) => {
+            const growth = investor.balance - investor.contributed;
+            const isPositive = growth >= 0;
 
-              return (
-                <div
-                  key={investor.id}
-                  className="flex items-center justify-between p-4 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors cursor-pointer"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="h-12 w-12 rounded-full bg-gradient-accent flex items-center justify-center text-lg font-semibold text-primary">
+            return (
+              <Card
+                key={investor.id}
+                hoverable
+                style={{
+                  borderRadius: 8,
+                  background: "#fafafa",
+                  border: "1px solid #e5e7eb",
+                }}
+                bodyStyle={{ padding: 16 }}
+              >
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <Space size="middle">
+                    <div
+                      style={{
+                        width: 48,
+                        height: 48,
+                        borderRadius: "50%",
+                        background: "#1976d2",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: 18,
+                        fontWeight: 600,
+                        color: "#ffffff",
+                      }}
+                    >
                       {investor.name.split(" ").slice(-1)[0][0]}
                     </div>
                     <div>
-                      <p className="font-medium">{investor.name}</p>
-                      <p className="text-sm text-muted-foreground">
+                      <Text strong style={{ fontSize: 16, display: "block" }}>
+                        {investor.name}
+                      </Text>
+                      <Text type="secondary" style={{ fontSize: 14 }}>
                         Last activity: {investor.lastActivity}
-                      </p>
+                      </Text>
                     </div>
-                  </div>
-                  <div className="flex items-center gap-8">
-                    <div className="text-right">
-                      <p className="text-sm text-muted-foreground">Contributed</p>
-                      <p className="font-mono font-medium">
+                  </Space>
+                  <Space size="large">
+                    <div style={{ textAlign: "right" }}>
+                      <Text type="secondary" style={{ fontSize: 14, display: "block" }}>
+                        Contributed
+                      </Text>
+                      <Text strong style={{ fontFamily: "'JetBrains Mono', ui-monospace, monospace" }}>
                         ₦{(investor.contributed / 1000000).toFixed(1)}M
-                      </p>
+                      </Text>
                     </div>
-                    <div className="text-right">
-                      <p className="text-sm text-muted-foreground">Current Balance</p>
-                      <p className="font-mono font-semibold">
+                    <div style={{ textAlign: "right" }}>
+                      <Text type="secondary" style={{ fontSize: 14, display: "block" }}>
+                        Current Balance
+                      </Text>
+                      <Text
+                        strong
+                        style={{
+                          fontFamily: "'JetBrains Mono', ui-monospace, monospace",
+                          fontSize: 16,
+                        }}
+                      >
                         ₦{(investor.balance / 1000000).toFixed(1)}M
-                      </p>
+                      </Text>
                     </div>
-                    <div className="text-right w-24">
-                      <p className="text-sm text-muted-foreground">ROI</p>
-                      <div className={`flex items-center justify-end gap-1 font-mono font-semibold ${isPositive ? 'text-success' : 'text-destructive'}`}>
-                        {isPositive ? <ArrowUpRight className="h-4 w-4" /> : <ArrowDownRight className="h-4 w-4" />}
-                        {investor.roi}%
+                    <div style={{ textAlign: "right", minWidth: 96 }}>
+                      <Text type="secondary" style={{ fontSize: 14, display: "block" }}>
+                        ROI
+                      </Text>
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "flex-end",
+                          gap: 4,
+                        }}
+                      >
+                        {isPositive ? (
+                          <ArrowUpRight style={{ fontSize: 16, color: "#52c41a" }} />
+                        ) : (
+                          <ArrowDownRight style={{ fontSize: 16, color: "#ff4d4f" }} />
+                        )}
+                        <Text
+                          strong
+                          style={{
+                            fontFamily: "'JetBrains Mono', ui-monospace, monospace",
+                            color: isPositive ? "#52c41a" : "#ff4d4f",
+                          }}
+                        >
+                          {investor.roi}%
+                        </Text>
                       </div>
                     </div>
-                  </div>
+                  </Space>
                 </div>
-              );
-            })}
-          </div>
-        </CardContent>
+              </Card>
+            );
+          })}
+        </Space>
       </Card>
     </DashboardLayout>
   );
