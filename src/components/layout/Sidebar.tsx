@@ -1,5 +1,5 @@
 import { useNavigate, useLocation } from "react-router-dom";
-import { Layout, Menu, Avatar, Button, Typography } from "antd";
+import { Layout, Menu, Avatar, Button, Typography, theme, Space, Flex } from "antd";
 import type { MenuProps } from "antd";
 import {
   LayoutDashboard,
@@ -16,6 +16,7 @@ import {
 
 const { Sider } = Layout;
 const { Text, Title } = Typography;
+const { useToken } = theme;
 
 type MenuItem = Required<MenuProps>["items"][number];
 
@@ -82,6 +83,7 @@ const navItems: MenuItem[] = [
 export function Sidebar() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { token } = useToken();
 
   const handleMenuClick: MenuProps["onClick"] = (e) => {
     if (e.key && !e.keyPath.includes("inventory") && !e.keyPath.includes("wholesale")) {
@@ -107,35 +109,38 @@ export function Sidebar() {
         top: 0,
         bottom: 0,
         background: "#000000",
-        borderRight: "1px solid #e0e0e0",
+        borderRight: `1px solid ${token.colorBorder}`,
       }}
     >
-      <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
+      <Flex vertical style={{ height: "100%" }}>
         {/* Logo */}
-       <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <div style={{
-              width: 48,
-              height: 48,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              borderRadius: 12,
-              background: "#ffffff",
-              border: "1px solid #e0e0e0",
-              boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
-            }}>
-              <img src="/logo.png" alt="logo" style={{ width: 24, height: 24, objectFit: "contain" }} />
-            </div>
-            <div>
-              <Title level={4} style={{ color: "#f1f5f9", margin: 0 }}>
-                Basid Hub
-              </Title>
-              <Text style={{ color: "rgba(241, 245, 249, 0.7)", fontSize: 14 }}>
-                Management Portal
-              </Text>
-            </div>
+        <Flex 
+          align="center" 
+          gap={token.margin}
+          style={{ padding: token.paddingLG }}
+        >
+          <div style={{
+            width: 48,
+            height: 48,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            borderRadius: token.borderRadiusLG,
+            background: token.colorBgContainer,
+            border: `1px solid ${token.colorBorder}`,
+            boxShadow: token.boxShadowSecondary,
+          }}>
+            <img src="/logo.png" alt="logo" style={{ width: 24, height: 24, objectFit: "contain" }} />
           </div>
-
+          <Space direction="vertical" size={0}>
+            <Title level={4} style={{ color: "#f1f5f9", margin: 0 }}>
+              Basid Hub
+            </Title>
+            <Text style={{ color: "rgba(241, 245, 249, 0.7)", fontSize: token.fontSizeSM }}>
+              Management Portal
+            </Text>
+          </Space>
+        </Flex>
 
         {/* Navigation */}
         <Menu
@@ -157,22 +162,21 @@ export function Sidebar() {
         {/* User section */}
         <div
           style={{
-            borderTop: "1px solid #e0e0e0",
-            padding: "16px",
+            borderTop: `1px solid ${token.colorBorder}`,
+            padding: token.padding,
           }}
         >
-          <div
+          <Flex
+            align="center"
+            gap={token.marginSM}
             style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 12,
-              padding: "8px 12px",
-              borderRadius: 8,
+              padding: `${token.paddingXS}px ${token.paddingSM}px`,
+              borderRadius: token.borderRadius,
             }}
           >
             <Avatar
               style={{
-                backgroundColor: "#1976d2",
+                backgroundColor: token.colorPrimary,
                 color: "#ffffff",
                 fontWeight: 600,
               }}
@@ -182,12 +186,12 @@ export function Sidebar() {
             <div style={{ flex: 1, minWidth: 0 }}>
               <Text
                 strong
-                style={{ color: "#ffffff", fontSize: 14, display: "block" }}
+                style={{ color: "#ffffff", fontSize: token.fontSize, display: "block" }}
                 ellipsis
               >
                 Taiwo Samson
               </Text>
-              <Text style={{ color: "#94a3b8", fontSize: 12, display: "block" }} ellipsis>
+              <Text style={{ color: "#94a3b8", fontSize: token.fontSizeSM, display: "block" }} ellipsis>
                 Admin
               </Text>
             </div>
@@ -197,9 +201,9 @@ export function Sidebar() {
               style={{ color: "#b0b0b0" }}
               onClick={() => navigate("/login")}
             />
-          </div>
+          </Flex>
         </div>
-      </div>
+      </Flex>
     </Sider>
   );
 }

@@ -1,6 +1,7 @@
-import { Card, Progress, Typography, Badge } from "antd";
+import { Card, Progress, Typography, Badge, theme, Space } from "antd";
 
 const { Title, Text } = Typography;
+const { useToken } = theme;
 
 const topProducts = [
   { name: "iPhone 15 Pro Max", sales: 45, revenue: 2700000, progress: 100 },
@@ -11,60 +12,62 @@ const topProducts = [
 ];
 
 export function TopProducts() {
+  const { token } = useToken();
+  
   return (
     <Card
-      style={{ borderRadius: 12, border: "1px solid #e5e7eb" }}
+      style={{ borderRadius: token.borderRadiusLG, border: `1px solid ${token.colorBorder}` }}
       styles={{
-        header: { borderBottom: "1px solid #e5e7eb", padding: "16px 24px" },
-        body: { padding: 24 },
+        header: { borderBottom: `1px solid ${token.colorBorder}`, padding: `${token.padding}px ${token.paddingLG}px` },
+        body: { padding: token.paddingLG },
       }}
       title={<Title level={5} style={{ margin: 0 }}>Top Selling Models</Title>}
     >
-      <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      <Space direction="vertical" size={token.padding} style={{ width: "100%" }}>
         {topProducts.map((product, index) => (
           <div key={product.name}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: token.marginXS }}>
+              <div style={{ display: "flex", alignItems: "center", gap: token.marginSM }}>
                 <Badge
                   count={index + 1}
                   style={{
-                    backgroundColor: "#f5f5f5",
-                    color: "#8c8c8c",
+                    backgroundColor: token.colorBgLayout,
+                    color: token.colorTextSecondary,
                     minWidth: 24,
                     height: 24,
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                     borderRadius: "50%",
-                    fontSize: 12,
+                    fontSize: token.fontSizeSM,
                     fontWeight: 600,
                   }}
                 />
-                <Text strong style={{ fontSize: 14 }}>{product.name}</Text>
+                <Text strong style={{ fontSize: token.fontSize }}>{product.name}</Text>
               </div>
               <div style={{ textAlign: "right" }}>
                 <Text
                   strong
                   style={{
-                    fontSize: 14,
+                    fontSize: token.fontSize,
                     fontFamily: "'JetBrains Mono', ui-monospace, monospace",
                     display: "block",
                   }}
                 >
                   ₦{(product.revenue / 1000).toFixed(0)}k
                 </Text>
-                <Text type="secondary" style={{ fontSize: 12 }}>{product.sales} units</Text>
+                <Text type="secondary" style={{ fontSize: token.fontSizeSM }}>{product.sales} units</Text>
               </div>
             </div>
             <Progress
               percent={product.progress}
               showInfo={false}
-              strokeColor="#1976d2"
+              strokeColor={token.colorPrimary}
               size="small"
             />
           </div>
         ))}
-      </div>
+      </Space>
     </Card>
   );
 }

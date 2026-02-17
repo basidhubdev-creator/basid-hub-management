@@ -7,9 +7,10 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { Card, Typography } from "antd";
+import { Card, Typography, theme, Flex } from "antd";
 
 const { Title } = Typography;
+const { useToken } = theme;
 
 const data = [
   { day: "Mon", sales: 245000, repairs: 82000 },
@@ -22,12 +23,14 @@ const data = [
 ];
 
 export function SalesChart() {
+  const { token } = useToken();
+  
   return (
     <Card
-      style={{ borderRadius: 12, border: "1px solid #e5e7eb" }}
+      style={{ borderRadius: token.borderRadiusLG, border: `1px solid ${token.colorBorder}` }}
       styles={{
-        header: { borderBottom: "1px solid #e5e7eb", padding: "16px 24px" },
-        body: { padding: 24 },
+        header: { borderBottom: `1px solid ${token.colorBorder}`, padding: `${token.padding}px ${token.paddingLG}px` },
+        body: { padding: token.paddingLG },
       }}
       title={<Title level={5} style={{ margin: 0 }}>Sales & Repair Revenue</Title>}
     >
@@ -40,33 +43,33 @@ export function SalesChart() {
                 <stop offset="100%" stopColor="#000000" stopOpacity={0} />
               </linearGradient>
               <linearGradient id="repairsGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#1976d2" stopOpacity={0.3} />
-                <stop offset="100%" stopColor="#1976d2" stopOpacity={0} />
+                <stop offset="0%" stopColor={token.colorPrimary} stopOpacity={0.3} />
+                <stop offset="100%" stopColor={token.colorPrimary} stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
+            <CartesianGrid strokeDasharray="3 3" stroke={token.colorBorder} vertical={false} />
             <XAxis
               dataKey="day"
               axisLine={false}
               tickLine={false}
-              tick={{ fill: "#8c8c8c", fontSize: 12 }}
+              tick={{ fill: token.colorTextSecondary, fontSize: token.fontSizeSM }}
               dy={10}
             />
             <YAxis
               axisLine={false}
               tickLine={false}
-              tick={{ fill: "#8c8c8c", fontSize: 12 }}
+              tick={{ fill: token.colorTextSecondary, fontSize: token.fontSizeSM }}
               tickFormatter={(value: number) => `₦${(value / 1000).toFixed(0)}k`}
               dx={-10}
             />
             <Tooltip
               contentStyle={{
-                backgroundColor: "#fff",
-                border: "1px solid #e5e7eb",
-                borderRadius: "8px",
+                backgroundColor: token.colorBgContainer,
+                border: `1px solid ${token.colorBorder}`,
+                borderRadius: token.borderRadius,
                 boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.07)",
               }}
-              labelStyle={{ color: "#000000", fontWeight: 600 }}
+              labelStyle={{ color: token.colorText, fontWeight: 600 }}
               formatter={(value: number | undefined, name: string | undefined) => {
                 if (value === undefined || name === undefined) return ["", ""];
                 return [
@@ -85,23 +88,23 @@ export function SalesChart() {
             <Area
               type="monotone"
               dataKey="repairs"
-              stroke="#1976d2"
+              stroke={token.colorPrimary}
               strokeWidth={2}
               fill="url(#repairsGradient)"
             />
           </AreaChart>
         </ResponsiveContainer>
       </div>
-      <div style={{ marginTop: 16, display: "flex", alignItems: "center", justifyContent: "center", gap: 24 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+      <Flex align="center" justify="center" gap={token.paddingLG} style={{ marginTop: token.padding }}>
+        <Flex align="center" gap={token.marginXS}>
           <div style={{ width: 12, height: 12, borderRadius: "50%", background: "#000000" }} />
-          <span style={{ fontSize: 14, color: "#8c8c8c" }}>Sales</span>
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <div style={{ width: 12, height: 12, borderRadius: "50%", background: "#1976d2" }} />
-          <span style={{ fontSize: 14, color: "#8c8c8c" }}>Repairs</span>
-        </div>
-      </div>
+          <span style={{ fontSize: token.fontSize, color: token.colorTextSecondary }}>Sales</span>
+        </Flex>
+        <Flex align="center" gap={token.marginXS}>
+          <div style={{ width: 12, height: 12, borderRadius: "50%", background: token.colorPrimary }} />
+          <span style={{ fontSize: token.fontSize, color: token.colorTextSecondary }}>Repairs</span>
+        </Flex>
+      </Flex>
     </Card>
   );
 }

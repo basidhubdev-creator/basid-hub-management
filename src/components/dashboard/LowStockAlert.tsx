@@ -1,7 +1,8 @@
 import { AlertTriangle } from "lucide-react";
-import { Card, Typography, Tag } from "antd";
+import { Card, Typography, Tag, theme, Space, Flex } from "antd";
 
 const { Title, Text } = Typography;
+const { useToken } = theme;
 
 const lowStockItems = [
   { name: "iPhone 15 Screen", stock: 2, min: 5, urgent: true },
@@ -12,15 +13,17 @@ const lowStockItems = [
 ];
 
 export function LowStockAlert() {
+  const { token } = useToken();
+  
   return (
     <Card
-      style={{ borderRadius: 12, border: "1px solid #e5e7eb" }}
+      style={{ borderRadius: token.borderRadiusLG, border: `1px solid ${token.colorBorder}` }}
       styles={{
-        header: { borderBottom: "1px solid #e5e7eb", padding: "16px 24px" },
-        body: { padding: 24 },
+        header: { borderBottom: `1px solid ${token.colorBorder}`, padding: `${token.padding}px ${token.paddingLG}px` },
+        body: { padding: token.paddingLG },
       }}
       title={
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <Flex justify="space-between" align="center">
           <Title level={5} style={{ margin: 0 }}>Low Stock Alert</Title>
           <Tag
             icon={<AlertTriangle style={{ width: 12, height: 12 }} />}
@@ -28,54 +31,53 @@ export function LowStockAlert() {
           >
             {lowStockItems.length} items
           </Tag>
-        </div>
+        </Flex>
       }
     >
-      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+      <Space direction="vertical" size={token.marginSM} style={{ width: "100%" }}>
         {lowStockItems.map((item) => (
-          <div
+          <Flex
             key={item.name}
+            align="center"
+            justify="space-between"
             style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              borderRadius: 8,
-              padding: 12,
-              background: item.urgent ? "#fff5f5" : "#f5f5f5",
+              borderRadius: token.borderRadius,
+              padding: token.paddingSM,
+              background: item.urgent ? "#fff5f5" : token.colorBgLayout,
               transition: "all 0.2s",
             }}
           >
-            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <Flex align="center" gap={token.marginSM}>
               {item.urgent && (
                 <div
                   style={{
                     width: 8,
                     height: 8,
                     borderRadius: "50%",
-                    background: "#ff4d4f",
+                    background: token.colorError,
                     animation: "pulse 2s ease-in-out infinite",
                   }}
                 />
               )}
-              <Text strong style={{ fontSize: 14 }}>{item.name}</Text>
-            </div>
+              <Text strong style={{ fontSize: token.fontSize }}>{item.name}</Text>
+            </Flex>
             <div style={{ textAlign: "right" }}>
               <Text
                 strong
                 style={{
-                  fontSize: 14,
+                  fontSize: token.fontSize,
                   fontFamily: "'JetBrains Mono', ui-monospace, monospace",
-                  color: item.urgent ? "#ff4d4f" : "#faad14",
+                  color: item.urgent ? token.colorError : token.colorWarning,
                   display: "block",
                 }}
               >
                 {item.stock} left
               </Text>
-              <Text type="secondary" style={{ fontSize: 12 }}>min: {item.min}</Text>
+              <Text type="secondary" style={{ fontSize: token.fontSizeSM }}>min: {item.min}</Text>
             </div>
-          </div>
+          </Flex>
         ))}
-      </div>
+      </Space>
     </Card>
   );
 }

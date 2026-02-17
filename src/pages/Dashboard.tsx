@@ -18,7 +18,7 @@ const Dashboard = () => {
   return (
     <DashboardLayout
       title="Dashboard"
-      description="Welcome back, Adebayo. Here's what's happening today."
+      description="Welcome back, Samson - here's an overview of your store's performance and recent activity."
     >
       {/* KPI Cards */}
       <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>

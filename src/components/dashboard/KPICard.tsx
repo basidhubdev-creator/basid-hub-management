@@ -1,8 +1,9 @@
 import type { ReactNode } from "react";
-import { Card, Statistic, Typography } from "antd";
+import { Card, Statistic, Typography, theme, Flex } from "antd";
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
 
 const { Text } = Typography;
+const { useToken } = theme;
 
 interface KPICardProps {
   title: string;
@@ -27,14 +28,15 @@ export function KPICard({
   trend,
   className,
 }: KPICardProps) {
+  const { token } = useToken();
   const TrendIcon = trend === "up" ? TrendingUp : trend === "down" ? TrendingDown : Minus;
   
   const trendColor =
     trend === "up"
-      ? "#52c41a"
+      ? token.colorSuccess
       : trend === "down"
-      ? "#ff4d4f"
-      : "#8c8c8c";
+      ? token.colorError
+      : token.colorTextSecondary;
 
   const displayValue = prefix ? `${prefix}${value}` : suffix ? `${value} ${suffix}` : value;
 
@@ -42,55 +44,55 @@ export function KPICard({
     <Card
       className={className}
       style={{
-        borderRadius: 12,
-        border: "1px solid #e5e7eb",
+        borderRadius: token.borderRadiusLG,
+        border: `1px solid ${token.colorBorder}`,
         transition: "all 0.2s",
       }}
-      bodyStyle={{ padding: 20 }}
+      bodyStyle={{ padding: token.paddingLG }}
       hoverable
     >
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+      <Flex justify="space-between" align="flex-start">
         <div style={{ flex: 1 }}>
-          <Text type="secondary" style={{ fontSize: 14, display: "block", marginBottom: 12 }}>
+          <Text type="secondary" style={{ fontSize: token.fontSize, display: "block", marginBottom: token.marginSM }}>
             {title}
           </Text>
           <Statistic
             value={displayValue}
             valueStyle={{
-              fontSize: 24,
+              fontSize: token.fontSizeHeading2,
               fontWeight: 700,
               fontFamily: "'JetBrains Mono', ui-monospace, monospace",
-              color: "#000000",
+              color: token.colorText,
             }}
           />
         </div>
         {icon && (
           <div
             style={{
-              borderRadius: 8,
-              background: "#f5f5f5",
-              padding: 10,
-              color: "#000000",
+              borderRadius: token.borderRadius,
+              background: token.colorBgLayout,
+              padding: token.paddingXS,
+              color: token.colorText,
               transition: "all 0.2s",
             }}
           >
             {icon}
           </div>
         )}
-      </div>
+      </Flex>
       
       {change !== undefined && (
-        <div style={{ marginTop: 16, display: "flex", alignItems: "center", gap: 8 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 4, color: trendColor }}>
+        <Flex align="center" gap={token.marginXS} style={{ marginTop: token.padding }}>
+          <Flex align="center" gap={4} style={{ color: trendColor }}>
             <TrendIcon style={{ width: 14, height: 14 }} />
-            <Text strong style={{ fontSize: 14, color: trendColor }}>
+            <Text strong style={{ fontSize: token.fontSize, color: trendColor }}>
               {Math.abs(change)}%
             </Text>
-          </div>
-          <Text type="secondary" style={{ fontSize: 12 }}>
+          </Flex>
+          <Text type="secondary" style={{ fontSize: token.fontSizeSM }}>
             {changeLabel}
           </Text>
-        </div>
+        </Flex>
       )}
     </Card>
   );

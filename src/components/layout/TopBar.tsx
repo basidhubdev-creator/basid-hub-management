@@ -1,9 +1,10 @@
 import { Bell, Search, Calendar } from "lucide-react";
-import { Layout, Input, Select, Button, Badge, Typography } from "antd";
+import { Layout, Input, Select, Button, Badge, Typography, theme, Space, Flex } from "antd";
 
 const { Header } = Layout;
 const { Title, Text } = Typography;
 const { Option } = Select;
+const { useToken } = theme;
 
 interface TopBarProps {
   title: string;
@@ -11,6 +12,8 @@ interface TopBarProps {
 }
 
 export function TopBar({ title, description }: TopBarProps) {
+  const { token } = useToken();
+  
   return (
     <Header
       style={{
@@ -20,25 +23,25 @@ export function TopBar({ title, description }: TopBarProps) {
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
-        borderBottom: "1px solid #e5e7eb",
+        borderBottom: `1px solid ${token.colorBorder}`,
         background: "rgba(255, 255, 255, 0.95)",
         backdropFilter: "blur(8px)",
-        padding: "0 24px",
+        padding: `0 ${token.paddingLG}px`,
         height: 64,
       }}
     >
-      <div style={{ display: "flex", flexDirection: "column" }}>
-        <Title level={5} style={{ margin: 0, fontSize: 18 }}>
+      <Space direction="vertical" size={0}>
+        <Title level={5} style={{ margin: 2, fontSize: token.fontSizeHeading5 }}>
           {title}
         </Title>
-        {description && (
-          <Text type="secondary" style={{ fontSize: 12 }}>
+        {/* {description && (
+          <Text type="secondary" style={{ fontSize: token.fontSizeSM }}>
             {description}
           </Text>
-        )}
-      </div>
+        )} */}
+      </Space>
 
-      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+      <Flex align="center" gap={token.marginSM}>
         {/* Date Range Selector */}
         <Select
           defaultValue="today"
@@ -61,14 +64,14 @@ export function TopBar({ title, description }: TopBarProps) {
         />
 
         {/* Notifications */}
-        <Badge dot color="#1976d2">
+        <Badge dot color={token.colorPrimary}>
           <Button
             type="text"
             icon={<Bell style={{ fontSize: 16 }} />}
             style={{ display: "flex", alignItems: "center", justifyContent: "center" }}
           />
         </Badge>
-      </div>
+      </Flex>
     </Header>
   );
 }

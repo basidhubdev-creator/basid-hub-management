@@ -1,7 +1,8 @@
 import { ShoppingCart, Wrench, TrendingUp, CreditCard, Package } from "lucide-react";
-import { Card, Typography, Avatar } from "antd";
+import { Card, Typography, Avatar, theme, Space } from "antd";
 
 const { Title, Text } = Typography;
+const { useToken } = theme;
 
 const activities = [
   {
@@ -52,23 +53,25 @@ const activities = [
 ];
 
 export function RecentActivity() {
+  const { token } = useToken();
+  
   return (
     <Card
-      style={{ borderRadius: 12, border: "1px solid #e5e7eb" }}
+      style={{ borderRadius: token.borderRadiusLG, border: `1px solid ${token.colorBorder}` }}
       styles={{
-        header: { borderBottom: "1px solid #e5e7eb", padding: "16px 24px" },
-        body: { padding: 24 },
+        header: { borderBottom: `1px solid ${token.colorBorder}`, padding: `${token.padding}px ${token.paddingLG}px` },
+        body: { padding: token.paddingLG },
       }}
       title={<Title level={5} style={{ margin: 0 }}>Recent Activity</Title>}
     >
-      <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      <Space direction="vertical" size={token.padding} style={{ width: "100%" }}>
         {activities.map((activity) => (
           <div
             key={activity.id}
             style={{
               display: "flex",
               alignItems: "flex-start",
-              gap: 16,
+              gap: token.padding,
             }}
           >
             <Avatar
@@ -79,28 +82,28 @@ export function RecentActivity() {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                borderRadius: 8,
+                borderRadius: token.borderRadius,
               }}
               icon={<activity.icon style={{ width: 16, height: 16 }} />}
             />
             <div style={{ flex: 1, minWidth: 0 }}>
-              <Text strong style={{ fontSize: 14, display: "block" }}>
+              <Text strong style={{ fontSize: token.fontSize, display: "block" }}>
                 {activity.title}
               </Text>
               <Text
                 type="secondary"
-                style={{ fontSize: 14, display: "block" }}
+                style={{ fontSize: token.fontSize, display: "block" }}
                 ellipsis
               >
                 {activity.description}
               </Text>
             </div>
-            <Text type="secondary" style={{ fontSize: 12, whiteSpace: "nowrap" }}>
+            <Text type="secondary" style={{ fontSize: token.fontSizeSM, whiteSpace: "nowrap" }}>
               {activity.time}
             </Text>
           </div>
         ))}
-      </div>
+      </Space>
     </Card>
   );
 }

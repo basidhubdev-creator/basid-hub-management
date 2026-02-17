@@ -13,7 +13,7 @@ interface DashboardLayoutProps {
 
 export function DashboardLayout({ children, title, description }: DashboardLayoutProps) {
   return (
-    <Layout style={{ minHeight: "100vh", background: "#ffffff" }}>
+    <Layout style={{ minHeight: "98vh", background: "#ffffff" }}>
       <Sidebar />
       <Layout style={{ marginLeft: 256 }}>
         <TopBar title={title} description={description} />
