@@ -34,11 +34,11 @@ export function TopBar({ title, description }: TopBarProps) {
         <Title level={5} style={{ margin: 2, fontSize: token.fontSizeHeading5 }}>
           {title}
         </Title>
-        {/* {description && (
+       {description && (
           <Text type="secondary" style={{ fontSize: token.fontSizeSM }}>
             {description}
           </Text>
-        )} */}
+        )}
       </Space>
 
       <Flex align="center" gap={token.marginSM}>
