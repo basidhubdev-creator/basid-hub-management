@@ -17,7 +17,7 @@ import { RecentActivity } from "@/components/dashboard/RecentActivity";
 const Dashboard = () => {
   return (
     <DashboardLayout
-      title="Dashboard"
+      title="Dashboard New"
       description="Welcome back, Samson - here's an overview of your store's performance and recent activity."
     >
       {/* KPI Cards */}
